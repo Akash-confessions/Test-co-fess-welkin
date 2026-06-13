@@ -47,7 +47,7 @@ z-index:-1;
 
 /* CARD */
 .card{
-width:360px;
+width:380px;
 padding:30px;
 text-align:center;
 background:transparent;
@@ -336,7 +336,8 @@ onclick="toggleMusic()"
 
 <audio
 id="music"
-src="music.mp3">
+src="music.mp3"
+loop>
 </audio>
 
 <script type="module">
@@ -378,13 +379,7 @@ const music =
 document.getElementById("music");
 
 if(music.paused){
-
 music.play();
-
-}else{
-
-music.pause();
-
 }
 
 }
