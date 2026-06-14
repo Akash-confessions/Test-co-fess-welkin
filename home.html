@@ -20,7 +20,7 @@ html {
 
 body {
   height: 100vh;
-  height: 100dvh; /* Dynamic viewport height - fixes mobile keyboard issues */
+  height: 100dvh;
   width: 100vw;
   overflow: hidden;
   display: flex;
@@ -29,7 +29,6 @@ body {
   background: black;
 }
 
-/* BACKGROUND VIDEO */
 #bgVideo {
   position: fixed;
   top: 0; left: 0;
@@ -45,7 +44,6 @@ body {
   z-index: -1;
 }
 
-/* ─── MAIN LAYOUT ─── */
 .chat-app {
   width: 100%;
   max-width: 480px;
@@ -60,7 +58,6 @@ body {
   border-right: 1px solid rgba(255,255,255,0.1);
 }
 
-/* ─── HEADER ─── */
 .chat-header-wrapper {
   flex-shrink: 0;
   position: relative;
@@ -96,7 +93,6 @@ body {
 
 .settings-icon:hover { transform: rotate(45deg); }
 
-/* DROPDOWN */
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -128,7 +124,6 @@ body {
 .dropdown-menu a:last-child { border-bottom: none; }
 .dropdown-menu a:hover { background: rgba(0,191,255,0.2); color: #00bfff; }
 
-/* ─── MESSAGES AREA ─── */
 .messages-box {
   flex: 1;
   overflow-y: auto;
@@ -147,7 +142,6 @@ body {
   border-radius: 10px;
 }
 
-/* CHAT BUBBLES */
 .message {
   width: auto;
   max-width: 85%;
@@ -185,7 +179,86 @@ body {
 
 .message.my-message .username { color: #a855f7; }
 
-/* ─── FOOTER — ALWAYS VISIBLE ON ALL DEVICES ─── */
+/* ── ADMIN MESSAGE BUBBLE ── */
+.message.admin-msg {
+  background: rgba(245,158,11,0.12);
+  border-left: 3px solid #f59e0b;
+  align-self: center;
+  text-align: center;
+  min-width: 200px;
+  max-width: 90%;
+}
+
+.message.admin-msg .username { color: #f59e0b; }
+
+/* ── BAN SCREEN ── */
+#banScreen {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.95);
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+}
+
+#banScreen.active { display:flex; }
+
+.ban-icon {
+  font-size: 64px;
+  color: #ef4444;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50%      { opacity:0.5; }
+}
+
+#banScreen h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+#banScreen p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+#banScreen .ban-reason {
+  margin-top: 16px;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 600;
+  max-width: 300px;
+}
+
+/* ── ADMIN NOTICE BANNER ── */
+.admin-notice {
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 8px 16px 0;
+  font-size: 12px;
+  color: #f59e0b;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+
 .footer-fixed-wrap {
   flex-shrink: 0;
   width: 100%;
@@ -193,11 +266,9 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid rgba(255,255,255,0.1);
-  /* Push above system home bar on iPhone etc */
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* THE CHAT INPUT — fixed, always shown, all devices */
 .chat-input-area {
   width: 100%;
   padding: 10px 14px;
@@ -208,7 +279,7 @@ body {
 
 .chat-input-area input {
   flex: 1;
-  min-width: 0; /* Prevents overflow on narrow screens */
+  min-width: 0;
   padding: 11px 16px;
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.12);
@@ -218,14 +289,12 @@ body {
   font-size: 14px;
   -webkit-appearance: none;
   appearance: none;
+  transition: border-color 0.2s;
 }
 
-.chat-input-area input:focus {
-  border-color: #00bfff;
-  background: rgba(255,255,255,0.14);
-}
-
+.chat-input-area input:focus { border-color: #00bfff; background: rgba(255,255,255,0.14); }
 .chat-input-area input::placeholder { color: rgba(255,255,255,0.5); }
+.chat-input-area input:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .send-btn {
   flex-shrink: 0;
@@ -245,8 +314,8 @@ body {
 }
 
 .send-btn:active { opacity: 0.8; transform: scale(0.93); }
+.send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* ANONYMOUS ID BAR */
 .bottom-id-bar {
   text-align: center;
   padding: 4px 10px 8px;
@@ -259,7 +328,6 @@ body {
 
 .bottom-id-bar span { color: #00bfff; font-weight: 700; }
 
-/* ─── MUSIC BUTTON ─── */
 .music-btn {
   position: fixed;
   bottom: 90px;
@@ -307,12 +375,9 @@ body {
   font-size: 12px;
 }
 
-/* ─── DESKTOP WIDE LAYOUT ─── */
 @media (min-width: 769px) {
   .chat-app { max-width: 860px; }
-
   .settings-icon { display: none !important; }
-
   .dropdown-menu {
     position: static !important;
     display: flex !important;
@@ -323,7 +388,6 @@ body {
     box-shadow: none !important;
     overflow: visible !important;
   }
-
   .dropdown-menu a {
     border-bottom: none !important;
     padding: 5px 14px !important;
@@ -335,6 +399,14 @@ body {
 </head>
 
 <body>
+
+<!-- BAN SCREEN -->
+<div id="banScreen">
+  <div class="ban-icon">🚫</div>
+  <h2>You Have Been Banned</h2>
+  <p>Your access to Welkin Group Chat has been restricted by an administrator.</p>
+  <div class="ban-reason" id="banReasonText">Reason: Violation of community guidelines.</div>
+</div>
 
 <video id="bgVideo" autoplay muted loop playsinline>
   <source src="home-background.mp4" type="video/mp4">
@@ -349,7 +421,6 @@ body {
 
 <div class="chat-app">
 
-  <!-- HEADER -->
   <div class="chat-header-wrapper">
     <div class="chat-header">
       <div class="chat-header-title">ANONYMOUS GROUP CHAT</div>
@@ -362,14 +433,18 @@ body {
     </div>
   </div>
 
-  <!-- MESSAGES -->
+  <!-- Admin notice banner (shown when admin sends you a message) -->
+  <div class="admin-notice" id="adminNotice" style="display:none;">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span id="adminNoticeText"></span>
+  </div>
+
   <div class="messages-box" id="messagesBox">
     <div style="text-align:center; color:rgba(255,255,255,0.3); font-size:12px; margin-top:20px;">
       Loading messages...
     </div>
   </div>
 
-  <!-- FOOTER — ALWAYS VISIBLE -->
   <div class="footer-fixed-wrap">
     <div class="chat-input-area">
       <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off" inputmode="text">
@@ -387,12 +462,12 @@ body {
 <button class="music-btn" onclick="toggleMusic()">🎵</button>
 <audio id="music" src="home-music.mp3" loop></audio>
 
-<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
     getFirestore, collection, addDoc,
-    query, orderBy, limit, onSnapshot, serverTimestamp
+    query, orderBy, limit, onSnapshot,
+    serverTimestamp, doc, getDoc, where, getDocs
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -405,9 +480,9 @@ body {
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const db  = getFirestore(app);
 
-  // Anonymous ID — persisted across sessions
+  // ── Anonymous ID (persistent)
   let USER_ID = localStorage.getItem("anonymousUserId");
   if (!USER_ID) {
     USER_ID = "#" + Math.floor(1000 + Math.random() * 9000);
@@ -420,16 +495,90 @@ body {
   const messagesBox = document.getElementById("messagesBox");
 
   function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g,
+    return String(str||"").replace(/[&<>'"]/g,
       t => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[t] || t));
   }
 
-  // Live messages
+  // ── LOG VISITOR
+  async function logVisitor() {
+    try {
+      const ua = navigator.userAgent;
+      let browser = "Unknown";
+      if (ua.includes("Chrome") && !ua.includes("Edg"))   browser = "Chrome";
+      else if (ua.includes("Firefox"))                      browser = "Firefox";
+      else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+      else if (ua.includes("Edg"))                          browser = "Edge";
+      else if (ua.includes("OPR") || ua.includes("Opera")) browser = "Opera";
+
+      let device = "Desktop";
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) device = "Mobile";
+      else if (/iPad|Tablet/i.test(ua)) device = "Tablet";
+
+      // Try to get stored user info
+      const storedName = localStorage.getItem("welkinUsername") || null;
+      const storedRoll = localStorage.getItem("welkinRollNumber") || null;
+
+      await addDoc(collection(db, "visitor_logs"), {
+        anonymousId: USER_ID,
+        browser,
+        device,
+        name: storedName,
+        rollNumber: storedRoll,
+        userAgent: ua,
+        visitedAt: serverTimestamp()
+      });
+    } catch(e) { /* silent */ }
+  }
+
+  // ── CHECK IF BANNED
+  async function checkBan() {
+    try {
+      const banRef = doc(db, "banned_users", USER_ID);
+      const banSnap = await getDoc(banRef);
+      if (banSnap.exists()) {
+        const data = banSnap.data();
+        const bs = document.getElementById("banScreen");
+        const br = document.getElementById("banReasonText");
+        br.textContent = "Reason: " + (data.reason || "Violation of community guidelines.");
+        bs.classList.add("active");
+        inputField.disabled = true;
+        sendBtn.disabled    = true;
+        return true;
+      }
+    } catch(e) { /* silent */ }
+    return false;
+  }
+
+  // ── CHECK FOR ADMIN MESSAGES TO THIS USER'S ROLL NUMBER
+  function listenAdminMessages() {
+    const storedRoll = localStorage.getItem("welkinRollNumber");
+    if (!storedRoll) return;
+    const q = query(
+      collection(db, "admin_messages"),
+      where("rollNumber", "==", storedRoll),
+      orderBy("sentAt", "desc"),
+      limit(1)
+    );
+    onSnapshot(q, snap => {
+      if (!snap.empty) {
+        const msg = snap.docs[0].data();
+        const noticeEl   = document.getElementById("adminNotice");
+        const noticeText = document.getElementById("adminNoticeText");
+        const typeLabel  = msg.type === "warning" ? "⚠️ Admin Warning" : msg.type === "banned" ? "🚫 Ban Notice" : "ℹ️ Admin Notice";
+        noticeText.textContent = `${typeLabel}: ${msg.message}`;
+        noticeEl.style.display = "flex";
+        // Auto-hide info messages after 10s
+        if (msg.type === "info") setTimeout(() => noticeEl.style.display="none", 10000);
+      }
+    });
+  }
+
+  // ── LIVE MESSAGES
   const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp","asc"), limit(100));
   onSnapshot(chatQuery, (snapshot) => {
     messagesBox.innerHTML = "";
-    snapshot.forEach((doc) => {
-      const d = doc.data();
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
       const div = document.createElement("div");
       div.className = d.userId === USER_ID ? "message my-message" : "message";
       const t = d.timestamp ? new Date(d.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : "Just now";
@@ -444,10 +593,23 @@ body {
     messagesBox.scrollTop = messagesBox.scrollHeight;
   });
 
-  // Send message — works on click AND enter key
+  // ── ALSO LISTEN FOR REAL-TIME BAN (if admin bans during session)
+  onSnapshot(doc(db, "banned_users", USER_ID), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      const bs = document.getElementById("banScreen");
+      const br = document.getElementById("banReasonText");
+      br.textContent = "Reason: " + (data.reason || "Violation of community guidelines.");
+      bs.classList.add("active");
+      inputField.disabled = true;
+      sendBtn.disabled    = true;
+    }
+  });
+
+  // ── SEND MESSAGE
   async function sendMessage() {
     const text = inputField.value.trim();
-    if (!text) return;
+    if (!text || inputField.disabled) return;
     inputField.value = "";
     try {
       await addDoc(collection(db, "group_chat"), {
@@ -470,15 +632,20 @@ body {
     }
   });
 
-  // Keep input visible when keyboard opens on mobile
   inputField.addEventListener("focus", () => {
-    setTimeout(() => {
-      messagesBox.scrollTop = messagesBox.scrollHeight;
-    }, 400);
+    setTimeout(() => { messagesBox.scrollTop = messagesBox.scrollHeight; }, 400);
   });
+
+  // ── INIT
+  (async () => {
+    const banned = await checkBan();
+    if (!banned) {
+      logVisitor();
+      listenAdminMessages();
+    }
+  })();
 </script>
 
-<!-- UI SCRIPTS -->
 <script>
 const settingsToggle = document.getElementById("settingsToggle");
 const dropdownMenu   = document.getElementById("dropdownMenu");
