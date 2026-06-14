@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welkin — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --bg:        #080c10;
+    --surface:   #0d1117;
+    --card:      #111820;
+    --border:    rgba(0,191,255,.12);
+    --border2:   rgba(0,191,255,.25);
+    --accent:    #00bfff;
+    --accent2:   #0077aa;
+    --green:     #00e676;
+    --red:       #ff4444;
+    --yellow:    #ffaa00;
+    --text:      #e6f0f8;
+    --muted:     rgba(230,240,248,.45);
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Inter', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID BG ── */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(0,191,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,191,255,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ══════════════════════════════════════════
+     ACCESS CODE GATE
+  ══════════════════════════════════════════ */
+  #accessGate {
+    position:fixed;
+    inset:0;
+    background: var(--bg);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+  }
+
+  .gate-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(0,191,255,.6);
+    margin-bottom: 8px;
+  }
+
+  .gate-sub {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 48px;
+  }
+
+  .gate-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+    width: 340px;
+    text-align: center;
+  }
+
+  .gate-box h2 {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .gate-input {
+    width: 100%;
+    background: rgba(0,191,255,.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 18px;
+    letter-spacing: 6px;
+    text-align: center;
+    outline: none;
+    margin-bottom: 20px;
+    transition: border .2s;
+  }
+
+  .gate-input:focus { border-color: var(--accent); }
+
+  .gate-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: #000;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+
+  .gate-btn:hover { opacity:.85; }
+
+  .gate-err {
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--red);
+    font-family: var(--mono);
+    display: none;
+  }
+
+  /* ══════════════════════════════════════════
+     MAIN LAYOUT
+  ══════════════════════════════════════════ */
+  #adminApp { display:none; position:relative; z-index:1; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(8,12,16,.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+  }
+
+  .topbar-sub {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--green);
+    background: rgba(0,230,118,.08);
+    border: 1px solid rgba(0,230,118,.2);
+    border-radius: 50px;
+    padding: 6px 16px;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: blink 1.2s infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity:1; box-shadow:0 0 6px var(--green); }
+    50%      { opacity:.2; box-shadow:none; }
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 16px 28px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 10px 22px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-badge {
+    background: var(--accent);
+    color: #000;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 50px;
+    padding: 2px 7px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  /* ── PANELS ── */
+  .panel { display:none; padding: 28px; max-width: 1100px; margin: 0 auto; }
+  .panel.active { display:block; }
+
+  /* ── SECTION HEADER ── */
+  .section-hd {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-hd i { color: var(--accent); }
+
+  /* ── CONFESSION CARD ── */
+  .confession-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    transition: border .2s;
+  }
+
+  .confession-card:hover { border-color: var(--border2); }
+
+  .cc-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cc-user {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cc-time {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .cc-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 50px;
+  }
+
+  .status-pending  { background:rgba(255,170,0,.12); color:var(--yellow); border:1px solid rgba(255,170,0,.3); }
+  .status-approved { background:rgba(0,230,118,.10); color:var(--green);  border:1px solid rgba(0,230,118,.3); }
+  .status-rejected { background:rgba(255,68,68,.10);  color:var(--red);    border:1px solid rgba(255,68,68,.3); }
+
+  .cc-text {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .cc-caption-area {
+    margin-bottom: 14px;
+  }
+
+  .cc-caption-input {
+    width: 100%;
+    background: rgba(0,191,255,.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    resize: vertical;
+    min-height: 70px;
+    outline: none;
+    transition: border .2s;
+  }
+
+  .cc-caption-input:focus { border-color: var(--accent); }
+  .cc-caption-input::placeholder { color: var(--muted); }
+
+  .cc-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 9px 18px;
+    border-radius: 9px;
+    border: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: opacity .15s, transform .1s;
+  }
+
+  .btn:hover   { opacity:.85; }
+  .btn:active  { transform:scale(.97); }
+
+  .btn-approve { background: rgba(0,230,118,.15); color:var(--green);  border:1px solid rgba(0,230,118,.3); }
+  .btn-reject  { background: rgba(255,170,0,.12); color:var(--yellow); border:1px solid rgba(255,170,0,.3); }
+  .btn-delete  { background: rgba(255,68,68,.12);  color:var(--red);    border:1px solid rgba(255,68,68,.3); }
+  .btn-caption { background: rgba(0,191,255,.1);   color:var(--accent); border:1px solid var(--border2); }
+  .btn-sm      { padding:6px 12px; font-size:10px; }
+
+  /* ── STATS GRID ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-table td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(0,191,255,.05);
+    vertical-align: top;
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+
+  .data-table tr:hover td { background: rgba(0,191,255,.03); }
+
+  .mono-cell {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    overflow-x: auto;
+  }
+
+  /* ── CHAT MESSAGES ── */
+  .chat-msg {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .chat-msg-left { flex:1; }
+
+  .chat-msg-user {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .chat-msg-text {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .chat-msg-time {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ── VISITORS ── */
+  .visitor-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(0,191,255,.06);
+  }
+
+  .visitor-row:last-child { border-bottom: none; }
+
+  .visitor-device {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .visitor-count {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ── EMPTY ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .empty-state i {
+    font-size: 32px;
+    margin-bottom: 16px;
+    display: block;
+    color: var(--border2);
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 14px 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    z-index: 9999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    letter-spacing: 1px;
+  }
+
+  #toast.show { transform:translateY(0); opacity:1; }
+
+  /* ── BAN BADGE ── */
+  .banned-badge {
+    background: rgba(255,68,68,.15);
+    color: var(--red);
+    border: 1px solid rgba(255,68,68,.3);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 50px;
+    margin-left: 8px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(0,191,255,.2); border-radius:10px; }
+
+  @media(max-width:600px) {
+    .topbar { padding:0 16px; }
+    .tabs   { padding:12px 16px 0; }
+    .panel  { padding:16px; }
+    .cc-actions { flex-direction:column; }
+    .btn    { justify-content:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ ACCESS GATE ══ -->
+<div id="accessGate">
+  <div class="gate-logo">WELKIN</div>
+  <div class="gate-sub">SECURE ADMIN ACCESS</div>
+  <div class="gate-box">
+    <h2>ENTER ACCESS CODE</h2>
+    <input class="gate-input" id="accessInput" type="password" maxlength="10" placeholder="••••••" />
+    <button class="gate-btn" onclick="checkAccess()">UNLOCK</button>
+    <div class="gate-err" id="gateErr">✕ INVALID ACCESS CODE</div>
+  </div>
+</div>
+
+<!-- ══ ADMIN APP ══ -->
+<div id="adminApp">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">WELKIN CONFESSIONS</div>
+      <div class="topbar-sub">ADMIN CONTROL PANEL</div>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      LIVE TRACKING
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('confessions',this)">
+      <i class="fa-solid fa-scroll"></i> CONFESSIONS
+      <span class="tab-badge" id="pendingBadge">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('approved',this)">
+      <i class="fa-solid fa-check-circle"></i> APPROVED
+    </button>
+    <button class="tab-btn" onclick="switchTab('chat',this)">
+      <i class="fa-solid fa-comments"></i> CHAT MESSAGES
+    </button>
+    <button class="tab-btn" onclick="switchTab('logs',this)">
+      <i class="fa-solid fa-user-clock"></i> LOGIN LOGS
+    </button>
+    <button class="tab-btn" onclick="switchTab('visitors',this)">
+      <i class="fa-solid fa-chart-line"></i> VISITORS
+    </button>
+  </div>
+
+  <!-- ══ CONFESSIONS PANEL ══ -->
+  <div class="panel active" id="panel-confessions">
+    <div class="section-hd"><i class="fa-solid fa-clock"></i> PENDING CONFESSIONS</div>
+    <div id="pendingList"></div>
+  </div>
+
+  <!-- ══ APPROVED PANEL ══ -->
+  <div class="panel" id="panel-approved">
+    <div class="section-hd"><i class="fa-solid fa-check"></i> APPROVED CONFESSIONS</div>
+    <div id="approvedList"></div>
+  </div>
+
+  <!-- ══ CHAT PANEL ══ -->
+  <div class="panel" id="panel-chat">
+    <div class="section-hd"><i class="fa-solid fa-comments"></i> ANONYMOUS CHAT MESSAGES</div>
+    <div id="chatList"></div>
+  </div>
+
+  <!-- ══ LOGS PANEL ══ -->
+  <div class="panel" id="panel-logs">
+    <div class="stats-grid" id="logStats">
+      <div class="stat-card">
+        <div class="stat-label">TOTAL LOGINS</div>
+        <div class="stat-value" id="totalLogins">—</div>
+        <div class="stat-sub">all time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">UNIQUE USERS</div>
+        <div class="stat-value" id="uniqueUsers">—</div>
+        <div class="stat-sub">distinct accounts</div>
+      </div>
+    </div>
+    <div class="section-hd"><i class="fa-solid fa-list"></i> LOGIN HISTORY</div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>USERNAME</th>
+            <th>ROLE</th>
+            <th>TIMESTAMP</th>
+            <th>DEVICE</th>
+          </tr>
+        </thead>
+        <tbody id="logTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ VISITORS PANEL ══ -->
+  <div class="panel" id="panel-visitors">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">TOTAL VISITS</div>
+        <div class="stat-value" id="totalVisits">—</div>
+        <div class="stat-sub">unique device hits</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">TODAY</div>
+        <div class="stat-value" id="todayVisits">—</div>
+        <div class="stat-sub">visits today</div>
+      </div>
+    </div>
+    <div class="section-hd"><i class="fa-solid fa-desktop"></i> BY DEVICE / BROWSER</div>
+    <div class="table-wrap" id="visitorTable">
+      <div class="empty-state"><i class="fa-solid fa-chart-bar"></i>Loading visitor data...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══ FIREBASE ══ -->
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, query, where, orderBy,
+  onSnapshot, doc, updateDoc, deleteDoc, getDocs,
+  addDoc, serverTimestamp, limit
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
+  authDomain: "welkin-b3fee.firebaseapp.com",
+  projectId: "welkin-b3fee",
+  storageBucket: "welkin-b3fee.firebasestorage.app",
+  messagingSenderId: "45894924521",
+  appId: "1:45894924521:web:ab81de1a168022ba1d9878"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// ── Helpers ──────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+function fmt(ts) {
+  if (!ts) return "—";
+  const d = ts.toDate();
+  return d.toLocaleString("en-US",{
+    month:"short", day:"numeric",
+    hour:"2-digit", minute:"2-digit"
+  });
+}
+
+function timeAgo(ts) {
+  if (!ts) return "";
+  const s = Math.floor((Date.now() - ts.toDate().getTime())/1000);
+  if (s < 60)   return `${s}s ago`;
+  if (s < 3600)  return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  return `${Math.floor(s/86400)}d ago`;
+}
+
+function emptyState(icon, msg) {
+  return `<div class="empty-state"><i class="fa-solid ${icon}"></i>${msg}</div>`;
+}
+
+// ── Confessions (pending) ─────────────────────────
+const pendingQ = query(
+  collection(db,"confessions"),
+  where("status","==","pending"),
+  orderBy("timestamp","desc")
+);
+
+onSnapshot(pendingQ, snap => {
+  const list = document.getElementById("pendingList");
+  const badge = document.getElementById("pendingBadge");
+  badge.textContent = snap.size;
+  list.innerHTML = "";
+
+  if (snap.empty) {
+    list.innerHTML = emptyState("fa-inbox","No pending confessions");
+    return;
+  }
+
+  snap.forEach(d => {
+    const data = d.data();
+    const card = document.createElement("div");
+    card.className = "confession-card";
+    card.innerHTML = `
+      <div class="cc-meta">
+        <div class="cc-user"><i class="fa-solid fa-user-secret"></i>${data.username || "anonymous"}</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="cc-status status-pending">PENDING</span>
+          <span class="cc-time">${fmt(data.timestamp)}</span>
+        </div>
+      </div>
+      <div class="cc-text">${data.text}</div>
+      <div class="cc-caption-area">
+        <textarea class="cc-caption-input" id="cap-${d.id}" placeholder="Write an optional admin caption before approving..."></textarea>
+      </div>
+      <div class="cc-actions">
+        <button class="btn btn-approve" onclick="approveConfession('${d.id}')">
+          <i class="fa-solid fa-check"></i> APPROVE
+        </button>
+        <button class="btn btn-reject" onclick="rejectConfession('${d.id}')">
+          <i class="fa-solid fa-ban"></i> REJECT
+        </button>
+        <button class="btn btn-delete" onclick="deleteConfession('${d.id}')">
+          <i class="fa-solid fa-trash"></i> DELETE
+        </button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+});
+
+// ── Confessions (approved) ────────────────────────
+const approvedQ = query(
+  collection(db,"confessions"),
+  where("status","==","approved"),
+  orderBy("timestamp","desc")
+);
+
+onSnapshot(approvedQ, snap => {
+  const list = document.getElementById("approvedList");
+  list.innerHTML = "";
+
+  if (snap.empty) {
+    list.innerHTML = emptyState("fa-check-circle","No approved confessions yet");
+    return;
+  }
+
+  snap.forEach(d => {
+    const data = d.data();
+    const card = document.createElement("div");
+    card.className = "confession-card";
+    card.innerHTML = `
+      <div class="cc-meta">
+        <div class="cc-user"><i class="fa-solid fa-user-secret"></i>${data.username || "anonymous"}</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="cc-status status-approved">APPROVED</span>
+          <span class="cc-time">${fmt(data.timestamp)}</span>
+        </div>
+      </div>
+      <div class="cc-text">${data.text}</div>
+      ${data.adminCaption ? `<div style="font-size:12px;color:var(--accent);margin-bottom:12px;padding:10px 14px;background:rgba(0,191,255,.07);border-left:3px solid var(--accent);border-radius:8px;"><strong>ADMIN:</strong> ${data.adminCaption}</div>` : ""}
+      <div class="cc-actions">
+        <button class="btn btn-delete btn-sm" onclick="deleteConfession('${d.id}')">
+          <i class="fa-solid fa-trash"></i> DELETE
+        </button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+});
+
+// ── Chat messages ─────────────────────────────────
+const chatQ = query(
+  collection(db,"messages"),
+  orderBy("timestamp","desc"),
+  limit(100)
+);
+
+onSnapshot(chatQ, snap => {
+  const list = document.getElementById("chatList");
+  list.innerHTML = "";
+
+  if (snap.empty) {
+    list.innerHTML = emptyState("fa-comment-slash","No chat messages found");
+    return;
+  }
+
+  snap.forEach(d => {
+    const data = d.data();
+    const div = document.createElement("div");
+    div.className = "chat-msg";
+    div.innerHTML = `
+      <div class="chat-msg-left">
+        <div class="chat-msg-user">
+          <i class="fa-solid fa-user-secret" style="font-size:10px;"></i>
+          ${data.user || "Anonymous"}
+          ${data.banned ? '<span class="banned-badge">BANNED</span>' : ""}
+        </div>
+        <div class="chat-msg-text">${data.text || data.message || ""}</div>
+        <div class="chat-msg-time">${fmt(data.timestamp)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+        <button class="btn btn-delete btn-sm" onclick="deleteChatMsg('${d.id}')">
+          <i class="fa-solid fa-trash"></i> DELETE
+        </button>
+        ${!data.banned ? `<button class="btn btn-reject btn-sm" onclick="banUser('${d.id}','${data.user || ""}')">
+          <i class="fa-solid fa-ban"></i> BAN
+        </button>` : ""}
+      </div>
+    `;
+    list.appendChild(div);
+  });
+});
+
+// ── Login logs ────────────────────────────────────
+const logsQ = query(
+  collection(db,"loginLogs"),
+  orderBy("timestamp","desc")
+);
+
+onSnapshot(logsQ, snap => {
+  const tbody = document.getElementById("logTable");
+  tbody.innerHTML = "";
+
+  document.getElementById("totalLogins").textContent = snap.size;
+  const users = new Set();
+
+  snap.forEach(d => {
+    const data = d.data();
+    users.add(data.username);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="mono-cell">${data.username || "—"}</td>
+      <td><span style="font-family:var(--mono);font-size:11px;color:var(--yellow);">${data.role || "USER"}</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${fmt(data.timestamp)}</td>
+      <td style="font-size:12px;color:var(--muted);">${data.device || "Unknown"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("uniqueUsers").textContent = users.size;
+});
+
+// ── Visitors ──────────────────────────────────────
+const visitQ = query(
+  collection(db,"visitors"),
+  orderBy("lastSeen","desc")
+);
+
+onSnapshot(visitQ, snap => {
+  const total = document.getElementById("totalVisits");
+  const todayEl = document.getElementById("todayVisits");
+  const tableEl = document.getElementById("visitorTable");
+
+  total.textContent = snap.size;
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let todayCount = 0;
+
+  const browsers = {};
+  snap.forEach(d => {
+    const data = d.data();
+    const b = data.browser || "Unknown";
+    browsers[b] = (browsers[b] || 0) + 1;
+    if (data.lastSeen && data.lastSeen.toDate() >= today) todayCount++;
+  });
+
+  todayEl.textContent = todayCount;
+
+  if (snap.empty) {
+    tableEl.innerHTML = emptyState("fa-chart-bar","No visitor data yet");
+    return;
+  }
+
+  const icons = {
+    Chrome:"fa-chrome", Firefox:"fa-firefox-browser",
+    Safari:"fa-safari", Edge:"fa-edge", Opera:"fa-opera"
+  };
+
+  let rows = "";
+  Object.entries(browsers)
+    .sort((a,b) => b[1]-a[1])
+    .forEach(([name,count]) => {
+      const icon = Object.entries(icons).find(([k]) => name.includes(k))?.[1] || "fa-globe";
+      rows += `
+        <div class="visitor-row">
+          <div class="visitor-device">
+            <i class="fa-brands ${icon}" style="color:var(--accent);width:18px;"></i>
+            ${name}
+          </div>
+          <div class="visitor-count">${count}</div>
+        </div>
+      `;
+    });
+
+  tableEl.innerHTML = rows;
+});
+
+// ── Actions ───────────────────────────────────────
+window.approveConfession = async (id) => {
+  const cap = document.getElementById(`cap-${id}`)?.value.trim() || "";
+  await updateDoc(doc(db,"confessions",id), {
+    status: "approved",
+    adminCaption: cap || null
+  });
+  toast("✓ Confession approved");
+};
+
+window.rejectConfession = async (id) => {
+  await updateDoc(doc(db,"confessions",id), { status:"rejected" });
+  toast("✗ Confession rejected");
+};
+
+window.deleteConfession = async (id) => {
+  if (!confirm("Delete this confession permanently?")) return;
+  await deleteDoc(doc(db,"confessions",id));
+  toast("⌫ Confession deleted");
+};
+
+window.deleteChatMsg = async (id) => {
+  if (!confirm("Delete this chat message?")) return;
+  await deleteDoc(doc(db,"messages",id));
+  toast("⌫ Message deleted");
+};
+
+window.banUser = async (msgId, userId) => {
+  if (!confirm(`Ban user "${userId}"? This will flag their messages.`)) return;
+  const msgQ = query(collection(db,"messages"), where("user","==",userId));
+  const msgSnap = await getDocs(msgQ);
+  const promises = msgSnap.docs.map(d => updateDoc(doc(db,"messages",d.id),{banned:true}));
+  await Promise.all(promises);
+  toast(`⊘ User ${userId} banned`);
+};
+</script>
+
+<script>
+// ── Access Gate ─────────────────────────────────
+const CODES = ["babar","1212"];
+
+function checkAccess() {
+  const val = document.getElementById("accessInput").value.trim().toLowerCase();
+  if (CODES.includes(val)) {
+    document.getElementById("accessGate").style.display = "none";
+    document.getElementById("adminApp").style.display  = "block";
+  } else {
+    const err = document.getElementById("gateErr");
+    err.style.display = "block";
+    document.getElementById("accessInput").value = "";
+    setTimeout(() => err.style.display="none", 2500);
+  }
+}
+
+document.getElementById("accessInput")
+  .addEventListener("keydown", e => { if(e.key==="Enter") checkAccess(); });
+
+// ── Tab Switcher ─────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("panel-"+name).classList.add("active");
+  btn.classList.add("active");
+}
+</script>
+
+</body>
+</html>
