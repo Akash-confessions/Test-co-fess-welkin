@@ -426,8 +426,15 @@ font-weight: 600;
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const USER_ANONYMOUS_ID = "#9805";
-  document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
+// Generate unique anonymous ID once per user/browser
+let USER_ANONYMOUS_ID = localStorage.getItem("anonymousUserId");
+
+if (!USER_ANONYMOUS_ID) {
+    USER_ANONYMOUS_ID = "#" + Math.floor(1000 + Math.random() * 9000);
+    localStorage.setItem("anonymousUserId", USER_ANONYMOUS_ID);
+}
+
+document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
 
   const chatForm = document.getElementById('chatForm');
   const inputField = document.getElementById('messageInput');
