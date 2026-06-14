@@ -23,11 +23,9 @@ overflow: hidden;
 display: flex;
 justify-content: center;
 align-items: center;
-/* Force complete and total transparency down to the base root */
 background: transparent !important; 
 }
 
-/* CRYSTAL CLEAR 1080P BACKGROUND VIDEO LAYER */
 #bgVideo{
 position:fixed;
 top:0;
@@ -38,7 +36,6 @@ object-fit:cover;
 z-index:-2;
 }
 
-/* NO DARK OVERLAY - LEFT COMPLETELY EMPTY AND CLEAR FOR 1080P VISIBILITY */
 .overlay{
 position:fixed;
 inset:0;
@@ -46,9 +43,6 @@ background: transparent;
 z-index:-1;
 }
 
-/* MAIN CHAT INTERFACE CORE 
-   Switched to a secure grid framework to prevent components from dropping below screen limits on desktop aspect ratios
-*/
 .chat-app {
 width: 100%;
 max-width: 480px; 
@@ -63,7 +57,6 @@ border-right: 1px solid rgba(255, 255, 255, 0.1);
 transition: max-width 0.3s ease;
 }
 
-/* HEADER LAYER COMPONENT */
 .chat-header-wrapper {
 position: relative;
 z-index: 10;
@@ -79,7 +72,6 @@ align-items: center;
 padding: 14px 18px;
 }
 
-/* Capital letters but small font size framework as requested */
 .chat-header-title {
 color: #00bfff;
 font-weight: 800;
@@ -101,7 +93,6 @@ display: block;
 transform: rotate(45deg);
 }
 
-/* SETTINGS DROPDOWN MENU */
 .dropdown-menu {
 position: absolute;
 top: 100%;
@@ -141,7 +132,6 @@ background: rgba(0, 191, 255, 0.2);
 color: #00bfff;
 }
 
-/* SCROLLABLE INNER FEED STREAM */
 .messages-box {
 overflow-y: auto;
 padding: 20px;
@@ -151,7 +141,6 @@ gap: 14px;
 background: transparent !important;
 }
 
-/* Custom Scrollbar Rules for Laptop/Desktop Browsers */
 .messages-box::-webkit-scrollbar {
 width: 5px;
 }
@@ -160,7 +149,6 @@ background: rgba(255, 255, 255, 0.15);
 border-radius: 10px;
 }
 
-/* CHAT BUBBLES - ALL FORCED TO ALIGN LEFT SIDE ONLY */
 .message {
 width: auto;
 max-width: 85%;
@@ -172,7 +160,7 @@ color: #fff;
 font-size: 14px;
 line-height: 1.4;
 box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-align-self: flex-start; /* Keeps everyone's messages on the left side */
+align-self: flex-start;
 background: rgba(20, 22, 31, 0.75);
 border-left: 3px solid #00bfff;
 }
@@ -195,7 +183,6 @@ color: #00bcff;
 color: rgba(255, 255, 255, 0.4);
 }
 
-/* Styling modifier for messages sent by you (Still remains on the left side) */
 .message.my-message {
 background: rgba(35, 30, 45, 0.85);
 border-left: 3px solid #a855f7;
@@ -205,27 +192,28 @@ border-left: 3px solid #a855f7;
 color: #a855f7;
 }
 
-/* FIXED FOOTER CONTROLS WRAPPER (Never moves when scrolling) */
+/* ── FOOTER: always visible, never disappears ── */
 .footer-fixed-wrap {
 width: 100%;
 background: rgba(0, 0, 0, 0.85);
 backdrop-filter: blur(10px);
 border-top: 1px solid rgba(255, 255, 255, 0.1);
-display: flex;
+display: flex !important;
 flex-direction: column;
+flex-shrink: 0;
 }
 
-/* CHAT INPUT AREA (Works perfectly across Desktop & Laptops) */
 .chat-input-area {
 width: 100%;
 padding: 12px 16px;
-display: flex;
+display: flex !important;
 align-items: center;
 gap: 10px;
 }
 
 .chat-input-area input {
 flex: 1;
+min-width: 0;
 padding: 12px 18px;
 background: rgba(255, 255, 255, 0.1);
 border: 1px solid rgba(255, 255, 255, 0.1);
@@ -240,7 +228,11 @@ transition: border-color 0.2s;
 border-color: #00bfff;
 }
 
-.chat-input-area button {
+.chat-input-area input::placeholder {
+color: rgba(255,255,255,0.45);
+}
+
+.send-btn {
 background: linear-gradient(90deg, #00bfff, #0066ff);
 color: #fff;
 border: none;
@@ -249,16 +241,18 @@ border-radius: 25px;
 font-weight: 700;
 font-size: 14px;
 cursor: pointer;
-display: block !important; /* Ensures button is explicitly visible on laptop/desktop environments */
-transition: opacity 0.2s ease;
+display: flex !important;
+align-items: center;
+justify-content: center;
 flex-shrink: 0;
+transition: opacity 0.2s ease;
+white-space: nowrap;
 }
 
-.chat-input-area button:hover {
+.send-btn:hover {
 opacity: 0.9;
 }
 
-/* ANONYMOUS ID DISPLAYER AT THE VERY BOTTOM AT THE FOOT */
 .bottom-id-bar {
 width: 100%;
 text-align: center;
@@ -275,10 +269,9 @@ color: #00bfff;
 font-weight: 600;
 }
 
-/* FLOATING MUSIC BUTTON SYSTEM ON BOTTOM RIGHT */
 .music-btn {
 position: fixed;
-bottom: 90px; /* Elevated perfectly to float over the desktop input panel */
+bottom: 90px;
 right: 20px;
 width: 44px;
 height: 44px;
@@ -327,19 +320,16 @@ color: white;
 font-weight: 600;
 }
 
-/* THE DESKTOP / WIDE ENVIRONMENT MODIFIER 
-   Triggers clean layout updates automatically when switching view scales.
-*/
+/* ── DESKTOP ── */
 @media (min-width: 769px) {
     .chat-app {
-        max-width: 900px; /* Expands width to feel like an authentic desktop application */
+        max-width: 900px;
     }
 
     .settings-icon {
-        display: none !important; /* Removes the mobile mobile gear icon selector */
+        display: none !important;
     }
 
-    /* Unfurls the mobile stack popup list into a horizontal top bar system */
     .dropdown-menu {
         position: static !important;
         display: flex !important;
@@ -356,6 +346,19 @@ font-weight: 600;
         padding: 6px 14px !important;
         font-size: 12px !important;
         border-radius: 20px;
+    }
+
+    /* Keep footer and input fully visible on desktop */
+    .footer-fixed-wrap {
+        display: flex !important;
+    }
+
+    .chat-input-area {
+        display: flex !important;
+    }
+
+    .send-btn {
+        display: flex !important;
     }
 }
 </style>
@@ -393,10 +396,11 @@ font-weight: 600;
     <div class="messages-box" id="messagesBox"></div>
 
     <div class="footer-fixed-wrap">
-        <form class="chat-input-area" id="chatForm">
-            <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off" required>
-            <button type="submit">Send</button>
-        </form>
+        <!-- Changed from <form> to <div> to prevent any browser default form hiding behaviour -->
+        <div class="chat-input-area" id="chatForm">
+            <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off">
+            <button class="send-btn" id="sendBtn">Send</button>
+        </div>
         
         <div class="bottom-id-bar">
             Your Anonymous ID: <span id="clientAnonymousId">#9805</span>
@@ -413,7 +417,6 @@ font-weight: 600;
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Production verified target credentials
   const firebaseConfig = {
     apiKey: "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
     authDomain: "welkin-b3fee.firebaseapp.com",
@@ -426,38 +429,29 @@ font-weight: 600;
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-// Generate unique anonymous ID once per user/browser
-let USER_ANONYMOUS_ID = localStorage.getItem("anonymousUserId");
+  let USER_ANONYMOUS_ID = localStorage.getItem("anonymousUserId");
+  if (!USER_ANONYMOUS_ID) {
+      USER_ANONYMOUS_ID = "#" + Math.floor(1000 + Math.random() * 9000);
+      localStorage.setItem("anonymousUserId", USER_ANONYMOUS_ID);
+  }
 
-if (!USER_ANONYMOUS_ID) {
-    USER_ANONYMOUS_ID = "#" + Math.floor(1000 + Math.random() * 9000);
-    localStorage.setItem("anonymousUserId", USER_ANONYMOUS_ID);
-}
+  document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
 
-document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
-
-  const chatForm = document.getElementById('chatForm');
   const inputField = document.getElementById('messageInput');
   const messagesBox = document.getElementById('messagesBox');
+  const sendBtn = document.getElementById('sendBtn');
 
-  // STREAM MESSAGES LIVE IN REALTIME FROM THE STORE
   const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp", "asc"), limit(100));
 
   onSnapshot(chatQuery, (snapshot) => {
       messagesBox.innerHTML = ""; 
-      
       snapshot.forEach((doc) => {
           const data = doc.data();
           const msgDiv = document.createElement('div');
-          
-          if (data.userId === USER_ANONYMOUS_ID) {
-              msgDiv.className = 'message my-message';
-          } else {
-              msgDiv.className = 'message';
-          }
-          
-          const formattedTime = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "Just now";
-          
+          msgDiv.className = data.userId === USER_ANONYMOUS_ID ? 'message my-message' : 'message';
+          const formattedTime = data.timestamp
+            ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            : "Just now";
           msgDiv.innerHTML = `
               <div class="meta-info">
                   <span class="username">${escapeHTML(data.user)}</span>
@@ -467,16 +461,12 @@ document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
           `;
           messagesBox.appendChild(msgDiv);
       });
-      
       messagesBox.scrollTop = messagesBox.scrollHeight;
   });
 
-  // WRITE DATA DIRECTLY INTO LIVE FIRESTORE COLLECTIONS PERMANENTLY
-  chatForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  async function sendMessage() {
       const rawText = inputField.value.trim();
       if (!rawText) return;
-
       try {
           await addDoc(collection(db, "group_chat"), {
               user: `Anonymous ${USER_ANONYMOUS_ID}`,
@@ -486,8 +476,14 @@ document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
           });
           inputField.value = '';
       } catch (err) {
-          console.error("Firebase write sequence failure: ", err);
+          console.error("Firebase write error:", err);
       }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  inputField.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendMessage();
   });
 
   function escapeHTML(str) {
@@ -498,7 +494,6 @@ document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
 </script>
 
 <script>
-// Ambient UI Toggle Operations
 const settingsToggle = document.getElementById('settingsToggle');
 const dropdownMenu = document.getElementById('dropdownMenu');
 
@@ -515,11 +510,7 @@ window.addEventListener('click', () => {
 
 function toggleMusic(){
     const music = document.getElementById("music");
-    if(music.paused){
-        music.play();
-    } else {
-        music.pause();
-    }
+    if(music.paused){ music.play(); } else { music.pause(); }
 }
 
 function playMusic(){
