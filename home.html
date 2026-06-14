@@ -203,23 +203,29 @@ border-left: 3px solid #a855f7;
 color: #a855f7;
 }
 
-/* FIXED FOOTER CONTROLS WRAPPER (Never moves when scrolling) */
+/* FIXED FOOTER CONTROLS WRAPPER 
+   Locked display parameters ensure it remains anchored visible in Desktop toggle layouts.
+*/
 .footer-fixed-wrap {
-flex-shrink: 0;
-width: 100%;
-background: rgba(0, 0, 0, 0.85);
+flex-shrink: 0 !important;
+width: 100% !important;
+background: rgba(0, 0, 0, 0.9) !important;
 backdrop-filter: blur(10px);
 border-top: 1px solid rgba(255, 255, 255, 0.1);
-display: flex;
-flex-direction: column;
-z-index: 5;
+display: flex !important;
+flex-direction: column !important;
+visibility: visible !important;
+opacity: 1 !important;
+z-index: 999;
+position: relative;
 }
 
-/* CHAT INPUT AREA (Works perfectly across Desktop & Laptops) */
+/* CHAT INPUT AREA */
 .chat-input-area {
 width: 100%;
-padding: 12px 16px;
-display: flex;
+padding: 14px 16px;
+display: flex !important;
+visibility: visible !important;
 align-items: center;
 gap: 10px;
 }
@@ -249,7 +255,8 @@ border-radius: 25px;
 font-weight: 700;
 font-size: 14px;
 cursor: pointer;
-display: block !important; /* Ensures button is explicitly visible on laptop/desktop environments */
+display: block !important; 
+visibility: visible !important;
 transition: opacity 0.2s ease;
 flex-shrink: 0;
 }
@@ -278,7 +285,7 @@ font-weight: 600;
 /* FLOATING MUSIC BUTTON SYSTEM ON BOTTOM RIGHT */
 .music-btn {
 position: fixed;
-bottom: 90px; /* Elevated perfectly to float over the desktop input panel */
+bottom: 110px; /* Elevated perfectly to float safely over the desktop view panel inputs */
 right: 20px;
 width: 44px;
 height: 44px;
@@ -301,7 +308,7 @@ transform: scale(0.9);
 
 .music-popup {
 position: fixed;
-bottom: 145px;
+bottom: 165px;
 right: 20px;
 background: rgba(0,0,0,.95);
 padding: 12px;
@@ -359,28 +366,10 @@ font-weight: 600;
     </div>
 
     <div class="messages-box" id="messagesBox">
-        
-        <div class="message">
-            <div class="meta-info">
-                <span class="username">Anonymous #5918</span>
-                <span class="timestamp">12m ago</span>
-            </div>
-            <p>Welcome to Welkin Confessions group thread!</p>
         </div>
-
-        <div class="message">
-            <div class="meta-info">
-                <span class="username">Anonymous #3401</span>
-                <span class="timestamp">8m ago</span>
-            </div>
-            <p>Is this platform totally hidden?</p>
-        </div>
-
-    </div>
 
     <div class="footer-fixed-wrap">
-        
-        <form class="chat-input-area" id="chatForm" onsubmit="event.preventDefault(); sendMessage();">
+        <form class="chat-input-area" id="chatForm">
             <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off" required>
             <button type="submit">Send</button>
         </form>
@@ -388,7 +377,6 @@ font-weight: 600;
         <div class="bottom-id-bar">
             Your Anonymous ID: <span id="clientAnonymousId">#9805</span>
         </div>
-        
     </div>
 
 </div>
@@ -397,14 +385,94 @@ font-weight: 600;
 
 <audio id="music" src="home-music.mp3" loop></audio>
 
-<script>
-// Assigned constant user profile configurations
-const USER_ANONYMOUS_ID = "#9805";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9/firebase-firestore.js";
 
-// Synchronize global footer ID targets on boot
+// !!! PASTE YOUR EXACT FIREBASE PLUG CODES HERE !!!
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Start Operations
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const USER_ANONYMOUS_ID = "#9805";
 document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
 
-// --- Settings Gear Dropdown Toggle Logic ---
+const chatForm = document.getElementById('chatForm');
+const inputField = document.getElementById('messageInput');
+const messagesBox = document.getElementById('messagesBox');
+
+// 1. STREAM MESSAGES REALTIME FROM FIRESTORE DATABASE
+const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp", "asc"), limit(100));
+
+onSnapshot(chatQuery, (snapshot) => {
+    messagesBox.innerHTML = ""; // Refresh feed context cleanly
+    
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+        const msgDiv = document.createElement('div');
+        
+        // Check if the message belongs to you or another anonymous profile node
+        if (data.userId === USER_ANONYMOUS_ID) {
+            msgDiv.className = 'message my-message';
+        } else {
+            msgDiv.className = 'message';
+        }
+        
+        // Calculate legible fallback timer text if structural sync is establishing
+        const formattedTime = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "Just now";
+        
+        msgDiv.innerHTML = `
+            <div class="meta-info">
+                <span class="username">${escapeHTML(data.user)}</span>
+                <span class="timestamp">${formattedTime}</span>
+            </div>
+            <p>${escapeHTML(data.text)}</p>
+        `;
+        messagesBox.appendChild(msgDiv);
+    });
+    
+    // Smooth view scroll down adjustment
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+});
+
+// 2. SEND MESSAGE PACKETS PERSISTENTLY UNTO LIVE FIREBASE COLLECTION
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const rawText = inputField.value.trim();
+    if (!rawText) return;
+
+    try {
+        await addDoc(collection(db, "group_chat"), {
+            user: `Anonymous ${USER_ANONYMOUS_ID}`,
+            userId: USER_ANONYMOUS_ID,
+            text: rawText,
+            timestamp: serverTimestamp()
+        });
+        inputField.value = '';
+    } catch (err) {
+        console.error("Database sync write failure: ", err);
+    }
+});
+
+// Utility Security Parser Layer
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
+}
+</script>
+
+<script>
+// --- Ambient Mechanics Layer (UI Drops/Dropdowns/Audio Toggle Controls) ---
 const settingsToggle = document.getElementById('settingsToggle');
 const dropdownMenu = document.getElementById('dropdownMenu');
 
@@ -413,50 +481,12 @@ settingsToggle.addEventListener('click', (e) => {
     dropdownMenu.classList.toggle('active');
 });
 
-// Structural close listener when body field space is checked
 window.addEventListener('click', () => {
     if (dropdownMenu.classList.contains('active')) {
         dropdownMenu.classList.remove('active');
     }
 });
 
-// --- Scroll Synchronization Anchor ---
-window.onload = function() {
-    const box = document.getElementById('messagesBox');
-    box.scrollTop = box.scrollHeight; 
-};
-
-// --- Outgoing Text Transmission Processing Handler ---
-function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const box = document.getElementById('messagesBox');
-    
-    if(input.value.trim() !== "") {
-        const msgDiv = document.createElement('div');
-        // Uses my-message formatting rule, staying left aligned alongside the stream
-        msgDiv.className = 'message my-message';
-        msgDiv.innerHTML = `
-            <div class="meta-info">
-                <span class="username">Anonymous (You) ${USER_ANONYMOUS_ID}</span>
-                <span class="timestamp">Just now</span>
-            </div>
-            <p>${escapeHTML(input.value)}</p>
-        `;
-        
-        box.appendChild(msgDiv);
-        input.value = '';
-        box.scrollTop = box.scrollHeight; // Instantly scroll viewport down to latest message
-    }
-}
-
-// Security Input Sanitizer Filter
-function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
-
-// --- Infinite Music Playback Looper Loop System ---
 function toggleMusic(){
     const music = document.getElementById("music");
     if(music.paused){
