@@ -23,11 +23,10 @@ overflow: hidden;
 display: flex;
 justify-content: center;
 align-items: center;
-/* Force complete and total transparency down to the base root */
 background: transparent !important; 
 }
 
-/* CRYSTAL CLEAR 1080P BACKGROUND VIDEO LAYER */
+/* BACKGROUND VIDEO LAYER */
 #bgVideo{
 position:fixed;
 top:0;
@@ -38,7 +37,6 @@ object-fit:cover;
 z-index:-2;
 }
 
-/* NO DARK OVERLAY - LEFT COMPLETELY EMPTY AND CLEAR FOR 1080P VISIBILITY */
 .overlay{
 position:fixed;
 inset:0;
@@ -46,38 +44,37 @@ background: transparent;
 z-index:-1;
 }
 
-/* MAIN CHAT INTERFACE CORE */
+/* MAIN STRUCTURE: Adaptive Grid to stop input fields from dropping off-screen */
 .chat-app {
 width: 100%;
 max-width: 480px; 
 height: 100vh;
-display: flex;
-flex-direction: column;
-background: transparent !important; /* Continuous transparency through layout frames */
+display: grid;
+grid-template-rows: auto 1fr auto;
+background: transparent !important;
 position: relative;
 z-index: 1;
 border-left: 1px solid rgba(255, 255, 255, 0.1);
 border-right: 1px solid rgba(255, 255, 255, 0.1);
+transition: max-width 0.3s ease;
 }
 
-/* HEADER LAYER COMPONENT */
+/* HEADER AND RESPONSIVE NAVIGATION LAYER */
 .chat-header-wrapper {
 position: relative;
 z-index: 10;
-background: rgba(0, 0, 0, 0.2); 
+background: rgba(0, 0, 0, 0.4); 
 backdrop-filter: blur(10px);
 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-flex-shrink: 0;
 }
 
 .chat-header {
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding: 12px 18px; /* Slightly compact padding */
+padding: 14px 18px;
 }
 
-/* Capital letters but small font size framework as requested */
 .chat-header-title {
 color: #00bfff;
 font-weight: 800;
@@ -92,13 +89,14 @@ cursor: pointer;
 font-size: 18px;
 padding: 4px;
 transition: transform 0.3s ease;
+display: block;
 }
 
 .settings-icon:hover {
 transform: rotate(45deg);
 }
 
-/* SETTINGS DROPDOWN MENU */
+/* Mobile Dropdown Styling Menu */
 .dropdown-menu {
 position: absolute;
 top: 100%;
@@ -123,14 +121,9 @@ padding: 12px 16px;
 text-decoration: none;
 font-size: 13px;
 border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-transition: background 0.2s;
 display: flex;
 align-items: center;
 gap: 10px;
-}
-
-.dropdown-menu a:last-child {
-border-bottom: none;
 }
 
 .dropdown-menu a:hover {
@@ -138,9 +131,8 @@ background: rgba(0, 191, 255, 0.2);
 color: #00bfff;
 }
 
-/* SCROLLABLE INNER FEED STREAM */
+/* LIVE CHAT VIEW FEED CONTAINER */
 .messages-box {
-flex: 1;
 overflow-y: auto;
 padding: 20px;
 display: flex;
@@ -149,7 +141,6 @@ gap: 14px;
 background: transparent !important;
 }
 
-/* Custom Scrollbar Rules for Laptop/Desktop Browsers */
 .messages-box::-webkit-scrollbar {
 width: 5px;
 }
@@ -158,7 +149,7 @@ background: rgba(255, 255, 255, 0.15);
 border-radius: 10px;
 }
 
-/* CHAT BUBBLES - ALL FORCED TO ALIGN LEFT SIDE ONLY */
+/* CHAT BUBBLES LEFT SIDE CONFIGURATION */
 .message {
 width: auto;
 max-width: 85%;
@@ -170,7 +161,7 @@ color: #fff;
 font-size: 14px;
 line-height: 1.4;
 box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-align-self: flex-start; /* Keeps everyone's messages on the left side */
+align-self: flex-start;
 background: rgba(20, 22, 31, 0.75);
 border-left: 3px solid #00bfff;
 }
@@ -193,7 +184,6 @@ color: #00bcff;
 color: rgba(255, 255, 255, 0.4);
 }
 
-/* Styling modifier for messages sent by you (Still remains on the left side) */
 .message.my-message {
 background: rgba(35, 30, 45, 0.85);
 border-left: 3px solid #a855f7;
@@ -203,29 +193,20 @@ border-left: 3px solid #a855f7;
 color: #a855f7;
 }
 
-/* FIXED FOOTER CONTROLS WRAPPER 
-   Locked display parameters ensure it remains anchored visible in Desktop toggle layouts.
-*/
+/* FIXED ADAPTIVE FOOTER PANELS */
 .footer-fixed-wrap {
-flex-shrink: 0 !important;
-width: 100% !important;
-background: rgba(0, 0, 0, 0.9) !important;
+width: 100%;
+background: rgba(0, 0, 0, 0.85);
 backdrop-filter: blur(10px);
 border-top: 1px solid rgba(255, 255, 255, 0.1);
-display: flex !important;
-flex-direction: column !important;
-visibility: visible !important;
-opacity: 1 !important;
-z-index: 999;
-position: relative;
+display: flex;
+flex-direction: column;
 }
 
-/* CHAT INPUT AREA */
 .chat-input-area {
 width: 100%;
-padding: 14px 16px;
-display: flex !important;
-visibility: visible !important;
+padding: 12px 16px;
+display: flex;
 align-items: center;
 gap: 10px;
 }
@@ -239,7 +220,6 @@ color: #fff;
 border-radius: 25px;
 outline: none;
 font-size: 14px;
-transition: border-color 0.2s;
 }
 
 .chat-input-area input:focus {
@@ -255,25 +235,15 @@ border-radius: 25px;
 font-weight: 700;
 font-size: 14px;
 cursor: pointer;
-display: block !important; 
-visibility: visible !important;
-transition: opacity 0.2s ease;
 flex-shrink: 0;
 }
 
-.chat-input-area button:hover {
-opacity: 0.9;
-}
-
-/* ANONYMOUS ID DISPLAYER AT THE VERY BOTTOM AT THE FOOT */
 .bottom-id-bar {
 width: 100%;
 text-align: center;
 padding: 6px 10px 10px 10px;
 font-size: 11px;
 color: rgba(255, 255, 255, 0.5);
-font-weight: 500;
-letter-spacing: 0.5px;
 border-top: 1px solid rgba(255, 255, 255, 0.03);
 }
 
@@ -282,10 +252,10 @@ color: #00bfff;
 font-weight: 600;
 }
 
-/* FLOATING MUSIC BUTTON SYSTEM ON BOTTOM RIGHT */
+/* MUSIC BUTTON ENGINE CONTROLS */
 .music-btn {
 position: fixed;
-bottom: 110px; /* Elevated perfectly to float safely over the desktop view panel inputs */
+bottom: 90px;
 right: 20px;
 width: 44px;
 height: 44px;
@@ -299,16 +269,11 @@ z-index: 999;
 display: flex;
 justify-content: center;
 align-items: center;
-transition: transform 0.2s;
-}
-
-.music-btn:active {
-transform: scale(0.9);
 }
 
 .music-popup {
 position: fixed;
-bottom: 165px;
+bottom: 145px;
 right: 20px;
 background: rgba(0,0,0,.95);
 padding: 12px;
@@ -320,7 +285,6 @@ color: white;
 font-size: 12px;
 z-index: 9999;
 max-width: 260px;
-box-shadow: 0 8px 25px rgba(0,0,0,0.5);
 border: 1px solid rgba(255,255,255,0.1);
 }
 
@@ -332,6 +296,39 @@ cursor: pointer;
 background: #00bfff;
 color: white;
 font-weight: 600;
+}
+
+/* ==========================================
+   DESKTOP AUTO-SHIFT LAYOUT OVERRIDES 
+   Triggered automatically when screen width widens
+   ========================================== */
+@media (min-width: 769px) {
+    .chat-app {
+        max-width: 900px; /* Window widens gracefully */
+    }
+
+    .settings-icon {
+        display: none; /* Hide mobile gear dropdown clicker */
+    }
+
+    /* Transform mobile dropdown into a clean top navigation bar automatically */
+    .dropdown-menu {
+        position: static;
+        display: flex !important;
+        flex-direction: row;
+        width: auto;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .dropdown-menu a {
+        border-bottom: none;
+        padding: 8px 14px;
+        font-size: 12px;
+        border-radius: 20px;
+    }
 }
 </style>
 </head>
@@ -356,18 +353,20 @@ font-weight: 600;
         <div class="chat-header">
             <div class="chat-header-title">ANONYMOUS GROUP CHAT</div>
             <i class="fa-solid fa-gear settings-icon" id="settingsToggle"></i>
-        </div>
-        
-        <div class="dropdown-menu" id="dropdownMenu">
-            <a href="send-confession.html"><i class="fa-solid fa-paper-plane"></i> Send Confession</a>
-            <a href="public-confessions.html"><i class="fa-solid fa-users"></i> Public Confession</a>
-            <a href="home.html"><i class="fa-solid fa-comments"></i> Anonymous Chat</a>
+            
+            <!-- Universal Menu: Automatically widens out inline on Desktop -->
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="send-confession.html"><i class="fa-solid fa-paper-plane"></i> Send Confession</a>
+                <a href="public-confessions.html"><i class="fa-solid fa-users"></i> Public Confession</a>
+                <a href="home.html"><i class="fa-solid fa-comments"></i> Anonymous Chat</a>
+            </div>
         </div>
     </div>
 
-    <div class="messages-box" id="messagesBox">
-        </div>
+    <!-- Live database feed box area -->
+    <div class="messages-box" id="messagesBox"></div>
 
+    <!-- Input control system (locked visible in all desktop and mobile rendering states) -->
     <div class="footer-fixed-wrap">
         <form class="chat-input-area" id="chatForm">
             <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off" required>
@@ -385,94 +384,90 @@ font-weight: 600;
 
 <audio id="music" src="home-music.mp3" loop></audio>
 
+<!-- PRODUCTION FIREBASE SYNC ENGINE MODULE -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// !!! PASTE YOUR EXACT FIREBASE PLUG CODES HERE !!!
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+  // Loaded with your exact system credentials
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
+    authDomain: "welkin-b3fee.firebaseapp.com",
+    projectId: "welkin-b3fee",
+    storageBucket: "welkin-b3fee.firebasestorage.app",
+    messagingSenderId: "45894924521",
+    appId: "1:45894924521:web:ab81de1a168022ba1d9878"
+  };
 
-// Start Operations
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-const USER_ANONYMOUS_ID = "#9805";
-document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
+  const USER_ANONYMOUS_ID = "#9805";
+  document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
 
-const chatForm = document.getElementById('chatForm');
-const inputField = document.getElementById('messageInput');
-const messagesBox = document.getElementById('messagesBox');
+  const chatForm = document.getElementById('chatForm');
+  const inputField = document.getElementById('messageInput');
+  const messagesBox = document.getElementById('messagesBox');
 
-// 1. STREAM MESSAGES REALTIME FROM FIRESTORE DATABASE
-const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp", "asc"), limit(100));
+  // STREAM SAVED LIVE CONVERSATIONS FROM FIRESTORE
+  const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp", "asc"), limit(100));
 
-onSnapshot(chatQuery, (snapshot) => {
-    messagesBox.innerHTML = ""; // Refresh feed context cleanly
-    
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        const msgDiv = document.createElement('div');
-        
-        // Check if the message belongs to you or another anonymous profile node
-        if (data.userId === USER_ANONYMOUS_ID) {
-            msgDiv.className = 'message my-message';
-        } else {
-            msgDiv.className = 'message';
-        }
-        
-        // Calculate legible fallback timer text if structural sync is establishing
-        const formattedTime = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "Just now";
-        
-        msgDiv.innerHTML = `
-            <div class="meta-info">
-                <span class="username">${escapeHTML(data.user)}</span>
-                <span class="timestamp">${formattedTime}</span>
-            </div>
-            <p>${escapeHTML(data.text)}</p>
-        `;
-        messagesBox.appendChild(msgDiv);
-    });
-    
-    // Smooth view scroll down adjustment
-    messagesBox.scrollTop = messagesBox.scrollHeight;
-});
+  onSnapshot(chatQuery, (snapshot) => {
+      messagesBox.innerHTML = ""; 
+      
+      snapshot.forEach((doc) => {
+          const data = doc.data();
+          const msgDiv = document.createElement('div');
+          
+          if (data.userId === USER_ANONYMOUS_ID) {
+              msgDiv.className = 'message my-message';
+          } else {
+              msgDiv.className = 'message';
+          }
+          
+          const formattedTime = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "Just now";
+          
+          msgDiv.innerHTML = `
+              <div class="meta-info">
+                  <span class="username">${escapeHTML(data.user)}</span>
+                  <span class="timestamp">${formattedTime}</span>
+              </div>
+              <p>${escapeHTML(data.text)}</p>
+          `;
+          messagesBox.appendChild(msgDiv);
+      });
+      
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+  });
 
-// 2. SEND MESSAGE PACKETS PERSISTENTLY UNTO LIVE FIREBASE COLLECTION
-chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const rawText = inputField.value.trim();
-    if (!rawText) return;
+  // WRITE AND SAVE OUTGOING MESSAGE OBJECTS PERMANENTLY
+  chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rawText = inputField.value.trim();
+      if (!rawText) return;
 
-    try {
-        await addDoc(collection(db, "group_chat"), {
-            user: `Anonymous ${USER_ANONYMOUS_ID}`,
-            userId: USER_ANONYMOUS_ID,
-            text: rawText,
-            timestamp: serverTimestamp()
-        });
-        inputField.value = '';
-    } catch (err) {
-        console.error("Database sync write failure: ", err);
-    }
-});
+      try {
+          await addDoc(collection(db, "group_chat"), {
+              user: `Anonymous ${USER_ANONYMOUS_ID}`,
+              userId: USER_ANONYMOUS_ID,
+              text: rawText,
+              timestamp: serverTimestamp()
+          });
+          inputField.value = '';
+      } catch (err) {
+          console.error("Firebase write error: ", err);
+      }
+  });
 
-// Utility Security Parser Layer
-function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-}
+  function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+          tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+  }
 </script>
 
 <script>
-// --- Ambient Mechanics Layer (UI Drops/Dropdowns/Audio Toggle Controls) ---
+// Mobile click handler logic for the settings toggler button
 const settingsToggle = document.getElementById('settingsToggle');
 const dropdownMenu = document.getElementById('dropdownMenu');
 
@@ -482,7 +477,7 @@ settingsToggle.addEventListener('click', (e) => {
 });
 
 window.addEventListener('click', () => {
-    if (dropdownMenu.classList.contains('active')) {
+    if (window.innerWidth <= 768 && dropdownMenu.classList.contains('active')) {
         dropdownMenu.classList.remove('active');
     }
 });
