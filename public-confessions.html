@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welkin Confessions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: transparent;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #bgVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .15);
+            backdrop-filter: blur(2px);
+            z-index: -1;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, .35);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .logo {
+            color: #00bfff;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 191, 255, .7);
+        }
+
+        .settings-btn {
+            font-size: 20px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 65px;
+            right: 15px;
+            width: 220px;
+            background: rgba(0, 0, 0, .95);
+            border-radius: 15px;
+            display: none;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 14px;
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+        }
+
+        .dropdown-menu a:hover {
+            background: rgba(0, 191, 255, .15);
+            color: #00bfff;
+        }
+
+        .feed {
+            max-width: 850px;
+            margin: auto;
+            padding: 20px 15px 100px;
+        }
+
+        .confession-card {
+            background: rgba(255, 255, 255, .08);
+            backdrop-filter: blur(20px);
+            border-radius: 22px;
+            padding: 22px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .25);
+        }
+
+        .confession-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #00bfff;
+            margin-bottom: 15px;
+        }
+
+        .confession-text {
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .admin-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 191, 255, .08);
+            border-left: 4px solid #00bfff;
+            border-radius: 15px;
+        }
+
+        .admin-title {
+            color: #00bfff;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .time {
+            margin-top: 12px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .7);
+        }
+
+        /* Comments Section */
+        .comments-section {
+            margin-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            padding-top: 15px;
+        }
+
+        .comments-toggle {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, .6);
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0;
+            margin-bottom: 12px;
+        }
+
+        .comments-toggle:hover {
+            color: #00bfff;
+        }
+
+        .comments-toggle i {
+            font-size: 14px;
+        }
+
+        .comments-list {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .comments-list.open {
+            display: flex;
+        }
+
+        .comments-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .comments-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 191, 255, .3);
+            border-radius: 10px;
+        }
+
+        .comment-item {
+            background: rgba(255, 255, 255, .05);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 13px;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .comment-user {
+            font-size: 11px;
+            font-weight: 700;
+            color: #00bfff;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .comment-text {
+            color: rgba(255, 255, 255, .85);
+        }
+
+        .comment-time {
+            font-size: 10px;
+            color: rgba(255, 255, 255, .4);
+            margin-top: 5px;
+        }
+
+        .no-comments {
+            font-size: 12px;
+            color: rgba(255, 255, 255, .35);
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .comment-input-area {
+            display: none;
+            gap: 8px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .comment-input-area.open {
+            display: flex;
+        }
+
+        .comment-input {
+            flex: 1;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 50px;
+            padding: 10px 16px;
+            color: white;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .comment-input::placeholder {
+            color: rgba(255, 255, 255, .35);
+        }
+
+        .comment-input:focus {
+            border-color: rgba(0, 191, 255, .5);
+        }
+
+        .comment-send-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #00bfff;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .comment-send-btn:hover {
+            background: #009fd4;
+            transform: scale(1.05);
+        }
+
+        .comment-send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            border: none;
+            border-radius: 50%;
+            background: #00bfff;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 191, 255, .5);
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 13px;
+            }
+
+            .confession-card {
+                padding: 18px;
+            }
+
+            .confession-text {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <video id="bgVideo" autoplay muted loop playsinline>
+        <source src="public-background.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay"></div>
+
+    <div class="header">
+        <div class="logo">WELKIN CONFESSIONS</div>
+        <i class="fa-solid fa-gear settings-btn" id="settingsToggle"></i>
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="public-confessions.html">
+                <i class="fa-solid fa-earth-americas"></i>
+                Public Confessions
+            </a>
+            <a href="send-confession.html">
+                <i class="fa-solid fa-paper-plane"></i>
+                Send Confession
+            </a>
+            <a href="home.html">
+                <i class="fa-solid fa-comments"></i>
+                Anonymous Chat
+            </a>
+        </div>
+    </div>
+
+    <div class="feed" id="confessionFeed"></div>
+
+    <button class="music-btn" onclick="toggleMusic()">🎵</button>
+    <audio id="music" src="public-music.mp3" loop></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            orderBy,
+            onSnapshot,
+            addDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
+            authDomain: "welkin-b3fee.firebaseapp.com",
+            projectId: "welkin-b3fee",
+            storageBucket: "welkin-b3fee.firebasestorage.app",
+            messagingSenderId: "45894924521",
+            appId: "1:45894924521:web:ab81de1a168022ba1d9878"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Generate or retrieve anonymous user ID
+        let anonId = localStorage.getItem("welkin_anon_id");
+        if (!anonId) {
+            anonId = "Anon#" + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem("welkin_anon_id", anonId);
+        }
+
+        function getTimeAgo(timestamp) {
+            if (!timestamp) return "Just now";
+            const diff = Math.floor((Date.now() - timestamp.toDate().getTime()) / 1000);
+            if (diff < 60) return `${diff}s ago`;
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+            if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+            return `${Math.floor(diff / 604800)}w ago`;
+        }
+
+        function listenToComments(confessionId, commentsList) {
+            const commentsQuery = query(
+                collection(db, "confessions", confessionId, "comments"),
+                orderBy("timestamp", "asc")
+            );
+
+            onSnapshot(commentsQuery, (snapshot) => {
+                commentsList.innerHTML = "";
+
+                if (snapshot.empty) {
+                    commentsList.innerHTML = `<div class="no-comments">No comments yet. Be the first!</div>`;
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const c = doc.data();
+                    const item = document.createElement("div");
+                    item.className = "comment-item";
+                    item.innerHTML = `
+                        <div class="comment-user">${c.user || "Anonymous"}</div>
+                        <div class="comment-text">${c.text}</div>
+                        <div class="comment-time">${getTimeAgo(c.timestamp)}</div>
+                    `;
+                    commentsList.appendChild(item);
+                });
+
+                // Auto scroll to latest
+                commentsList.scrollTop = commentsList.scrollHeight;
+            });
+        }
+
+        async function postComment(confessionId, input) {
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = "";
+            input.disabled = true;
+
+            try {
+                await addDoc(collection(db, "confessions", confessionId, "comments"), {
+                    text: text,
+                    user: anonId,
+                    timestamp: serverTimestamp()
+                });
+            } catch (err) {
+                console.error("Comment failed:", err);
+            }
+
+            input.disabled = false;
+            input.focus();
+        }
+
+        const confessionFeed = document.getElementById("confessionFeed");
+
+        const confessionQuery = query(
+            collection(db, "confessions"),
+            where("status", "==", "approved"),
+            orderBy("timestamp", "desc")
+        );
+
+        onSnapshot(confessionQuery, (snapshot) => {
+            confessionFeed.innerHTML = "";
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const confessionId = docSnap.id;
+
+                const card = document.createElement("div");
+                card.className = "confession-card";
+
+                card.innerHTML = `
+                    <div class="confession-label">PUBLIC CONFESSION</div>
+                    <div class="confession-text">${data.text}</div>
+                    ${data.adminCaption ? `
+                    <div class="admin-box">
+                        <div class="admin-title">ADMIN MESSAGE</div>
+                        ${data.adminCaption}
+                    </div>` : ""}
+                    <div class="time">${getTimeAgo(data.timestamp)}</div>
+
+                    <div class="comments-section">
+                        <button class="comments-toggle">
+                            <i class="fa-regular fa-comment"></i>
+                            <span class="toggle-label">View Comments</span>
+                        </button>
+                        <div class="comments-list"></div>
+                        <div class="comment-input-area">
+                            <input class="comment-input" type="text" placeholder="Write anonymously..." maxlength="300" />
+                            <button class="comment-send-btn">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                confessionFeed.appendChild(card);
+
+                const toggle = card.querySelector(".comments-toggle");
+                const toggleLabel = card.querySelector(".toggle-label");
+                const commentsList = card.querySelector(".comments-list");
+                const inputArea = card.querySelector(".comment-input-area");
+                const input = card.querySelector(".comment-input");
+                const sendBtn = card.querySelector(".comment-send-btn");
+
+                let loaded = false;
+                let open = false;
+
+                toggle.addEventListener("click", () => {
+                    open = !open;
+
+                    if (open) {
+                        commentsList.classList.add("open");
+                        inputArea.classList.add("open");
+                        toggleLabel.textContent = "Hide Comments";
+                        toggle.querySelector("i").className = "fa-solid fa-comment";
+
+                        if (!loaded) {
+                            listenToComments(confessionId, commentsList);
+                            loaded = true;
+                        }
+                    } else {
+                        commentsList.classList.remove("open");
+                        inputArea.classList.remove("open");
+                        toggleLabel.textContent = "View Comments";
+                        toggle.querySelector("i").className = "fa-regular fa-comment";
+                    }
+                });
+
+                sendBtn.addEventListener("click", () => {
+                    postComment(confessionId, input);
+                });
+
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") postComment(confessionId, input);
+                });
+            });
+        });
+    </script>
+
+    <script>
+        const settingsToggle = document.getElementById("settingsToggle");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+
+        settingsToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle("active");
+        });
+
+        window.addEventListener("click", () => {
+            dropdownMenu.classList.remove("active");
+        });
+
+        function toggleMusic() {
+            const music = document.getElementById("music");
+            if (music.paused) { music.play(); } else { music.pause(); }
+        }
+    </script>
+
+</body>
+</html>
