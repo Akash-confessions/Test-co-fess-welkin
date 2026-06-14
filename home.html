@@ -2,364 +2,334 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Welkin Group Chat</title>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-html, body {
-height: 100vh;
-width: 100vw;
-overflow: hidden;
-display: flex;
-justify-content: center;
-align-items: center;
-background: transparent !important; 
+html {
+  height: 100%;
+  height: -webkit-fill-available;
 }
 
-#bgVideo{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-object-fit:cover;
-z-index:-2;
+body {
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height - fixes mobile keyboard issues */
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  background: black;
 }
 
-.overlay{
-position:fixed;
-inset:0;
-background: transparent;
-z-index:-1;
+/* BACKGROUND VIDEO */
+#bgVideo {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: -2;
 }
 
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: -1;
+}
+
+/* ─── MAIN LAYOUT ─── */
 .chat-app {
-width: 100%;
-max-width: 480px; 
-height: 100vh;
-display: grid;
-grid-template-rows: auto 1fr auto;
-background: transparent !important;
-position: relative;
-z-index: 1;
-border-left: 1px solid rgba(255, 255, 255, 0.1);
-border-right: 1px solid rgba(255, 255, 255, 0.1);
-transition: max-width 0.3s ease;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(255,255,255,0.1);
 }
 
+/* ─── HEADER ─── */
 .chat-header-wrapper {
-position: relative;
-z-index: 10;
-background: rgba(0, 0, 0, 0.4); 
-backdrop-filter: blur(10px);
-border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .chat-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
 }
 
 .chat-header-title {
-color: #00bfff;
-font-weight: 800;
-font-size: 13px; 
-letter-spacing: 1px;
-text-transform: uppercase;
+  color: #00bfff;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .settings-icon {
-color: #fff;
-cursor: pointer;
-font-size: 18px;
-padding: 4px;
-transition: transform 0.3s ease;
-display: block;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 8px;
+  transition: transform 0.3s ease;
 }
 
-.settings-icon:hover {
-transform: rotate(45deg);
-}
+.settings-icon:hover { transform: rotate(45deg); }
 
+/* DROPDOWN */
 .dropdown-menu {
-position: absolute;
-top: 100%;
-right: 15px;
-width: 200px;
-background: rgba(0, 0, 0, 0.95); 
-border: 1px solid rgba(255, 255, 255, 0.15);
-border-radius: 12px;
-display: none; 
-flex-direction: column;
-overflow: hidden;
-box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  position: absolute;
+  top: 100%;
+  right: 15px;
+  width: 210px;
+  background: rgba(0,0,0,0.96);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
-.dropdown-menu.active {
-display: flex;
-}
+.dropdown-menu.active { display: flex; }
 
 .dropdown-menu a {
-color: #fff;
-padding: 12px 16px;
-text-decoration: none;
-font-size: 13px;
-border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-transition: background 0.2s;
-display: flex;
-align-items: center;
-gap: 10px;
+  color: #fff;
+  padding: 13px 16px;
+  text-decoration: none;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.dropdown-menu a:last-child {
-border-bottom: none;
-}
+.dropdown-menu a:last-child { border-bottom: none; }
+.dropdown-menu a:hover { background: rgba(0,191,255,0.2); color: #00bfff; }
 
-.dropdown-menu a:hover {
-background: rgba(0, 191, 255, 0.2);
-color: #00bfff;
-}
-
+/* ─── MESSAGES AREA ─── */
 .messages-box {
-overflow-y: auto;
-padding: 20px;
-display: flex;
-flex-direction: column;
-gap: 14px;
-background: transparent !important;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
-.messages-box::-webkit-scrollbar {
-width: 5px;
-}
+.messages-box::-webkit-scrollbar { width: 4px; }
 .messages-box::-webkit-scrollbar-thumb {
-background: rgba(255, 255, 255, 0.15);
-border-radius: 10px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
 }
 
+/* CHAT BUBBLES */
 .message {
-width: auto;
-max-width: 85%;
-min-width: 150px;
-padding: 10px 14px;
-border-radius: 12px;
-border-top-left-radius: 2px;
-color: #fff;
-font-size: 14px;
-line-height: 1.4;
-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-align-self: flex-start;
-background: rgba(20, 22, 31, 0.75);
-border-left: 3px solid #00bfff;
+  width: auto;
+  max-width: 85%;
+  min-width: 140px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border-top-left-radius: 2px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+  align-self: flex-start;
+  background: rgba(20,22,31,0.78);
+  border-left: 3px solid #00bfff;
 }
 
 .meta-info {
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-size: 11px;
-margin-bottom: 4px;
-gap: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 4px;
+  gap: 10px;
 }
 
-.username {
-font-weight: 600;
-color: #00bcff;
-}
-
-.timestamp {
-color: rgba(255, 255, 255, 0.4);
-}
+.username { font-weight: 600; color: #00bcff; }
+.timestamp { color: rgba(255,255,255,0.4); }
 
 .message.my-message {
-background: rgba(35, 30, 45, 0.85);
-border-left: 3px solid #a855f7;
+  background: rgba(35,30,45,0.85);
+  border-left: 3px solid #a855f7;
+  align-self: flex-end;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 2px;
 }
 
-.message.my-message .username {
-color: #a855f7;
-}
+.message.my-message .username { color: #a855f7; }
 
-/* ── FOOTER: always visible, never disappears ── */
+/* ─── FOOTER — ALWAYS VISIBLE ON ALL DEVICES ─── */
 .footer-fixed-wrap {
-width: 100%;
-background: rgba(0, 0, 0, 0.85);
-backdrop-filter: blur(10px);
-border-top: 1px solid rgba(255, 255, 255, 0.1);
-display: flex !important;
-flex-direction: column;
-flex-shrink: 0;
+  flex-shrink: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  /* Push above system home bar on iPhone etc */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* THE CHAT INPUT — fixed, always shown, all devices */
 .chat-input-area {
-width: 100%;
-padding: 12px 16px;
-display: flex !important;
-align-items: center;
-gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .chat-input-area input {
-flex: 1;
-min-width: 0;
-padding: 12px 18px;
-background: rgba(255, 255, 255, 0.1);
-border: 1px solid rgba(255, 255, 255, 0.1);
-color: #fff;
-border-radius: 25px;
-outline: none;
-font-size: 14px;
-transition: border-color 0.2s;
+  flex: 1;
+  min-width: 0; /* Prevents overflow on narrow screens */
+  padding: 11px 16px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+  border-radius: 25px;
+  outline: none;
+  font-size: 14px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .chat-input-area input:focus {
-border-color: #00bfff;
+  border-color: #00bfff;
+  background: rgba(255,255,255,0.14);
 }
 
-.chat-input-area input::placeholder {
-color: rgba(255,255,255,0.45);
-}
+.chat-input-area input::placeholder { color: rgba(255,255,255,0.5); }
 
 .send-btn {
-background: linear-gradient(90deg, #00bfff, #0066ff);
-color: #fff;
-border: none;
-padding: 12px 22px;
-border-radius: 25px;
-font-weight: 700;
-font-size: 14px;
-cursor: pointer;
-display: flex !important;
-align-items: center;
-justify-content: center;
-flex-shrink: 0;
-transition: opacity 0.2s ease;
-white-space: nowrap;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #00bfff, #0066ff);
+  color: #fff;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.send-btn:hover {
-opacity: 0.9;
-}
+.send-btn:active { opacity: 0.8; transform: scale(0.93); }
 
+/* ANONYMOUS ID BAR */
 .bottom-id-bar {
-width: 100%;
-text-align: center;
-padding: 6px 10px 10px 10px;
-font-size: 11px;
-color: rgba(255, 255, 255, 0.5);
-font-weight: 500;
-letter-spacing: 0.5px;
-border-top: 1px solid rgba(255, 255, 255, 0.03);
+  text-align: center;
+  padding: 4px 10px 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  border-top: 1px solid rgba(255,255,255,0.04);
 }
 
-.bottom-id-bar span {
-color: #00bfff;
-font-weight: 600;
-}
+.bottom-id-bar span { color: #00bfff; font-weight: 700; }
 
+/* ─── MUSIC BUTTON ─── */
 .music-btn {
-position: fixed;
-bottom: 90px;
-right: 20px;
-width: 44px;
-height: 44px;
-border: none;
-border-radius: 50%;
-cursor: pointer;
-font-size: 16px;
-background: white;
-box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-z-index: 999;
-display: flex;
-justify-content: center;
-align-items: center;
-transition: transform 0.2s;
-}
-
-.music-btn:active {
-transform: scale(0.9);
+  position: fixed;
+  bottom: 90px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  background: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .music-popup {
-position: fixed;
-bottom: 145px;
-right: 20px;
-background: rgba(0,0,0,.95);
-padding: 12px;
-border-radius: 12px;
-display: flex;
-align-items: center;
-gap: 10px;
-color: white;
-font-size: 12px;
-z-index: 9999;
-max-width: 260px;
-box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-border: 1px solid rgba(255,255,255,0.1);
+  position: fixed;
+  bottom: 145px;
+  right: 16px;
+  background: rgba(0,0,0,0.96);
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 12px;
+  z-index: 9999;
+  max-width: 250px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .music-popup button {
-border: none;
-padding: 5px 10px;
-border-radius: 6px;
-cursor: pointer;
-background: #00bfff;
-color: white;
-font-weight: 600;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #00bfff;
+  color: white;
+  font-weight: 600;
+  font-size: 12px;
 }
 
-/* ── DESKTOP ── */
+/* ─── DESKTOP WIDE LAYOUT ─── */
 @media (min-width: 769px) {
-    .chat-app {
-        max-width: 900px;
-    }
+  .chat-app { max-width: 860px; }
 
-    .settings-icon {
-        display: none !important;
-    }
+  .settings-icon { display: none !important; }
 
-    .dropdown-menu {
-        position: static !important;
-        display: flex !important;
-        flex-direction: row !important;
-        width: auto !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        overflow: visible !important;
-    }
+  .dropdown-menu {
+    position: static !important;
+    display: flex !important;
+    flex-direction: row !important;
+    width: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
 
-    .dropdown-menu a {
-        border-bottom: none !important;
-        padding: 6px 14px !important;
-        font-size: 12px !important;
-        border-radius: 20px;
-    }
-
-    /* Keep footer and input fully visible on desktop */
-    .footer-fixed-wrap {
-        display: flex !important;
-    }
-
-    .chat-input-area {
-        display: flex !important;
-    }
-
-    .send-btn {
-        display: flex !important;
-    }
+  .dropdown-menu a {
+    border-bottom: none !important;
+    padding: 5px 14px !important;
+    font-size: 12px !important;
+    border-radius: 20px;
+  }
 }
 </style>
 </head>
@@ -367,55 +337,63 @@ font-weight: 600;
 <body>
 
 <video id="bgVideo" autoplay muted loop playsinline>
-<source src="home-background.mp4" type="video/mp4">
+  <source src="home-background.mp4" type="video/mp4">
 </video>
-
 <div class="overlay"></div>
 
 <div class="music-popup" id="musicPopup">
-🎵 Turn on music for a better experience
-<button onclick="playMusic()">Play</button>
-<button onclick="closePopup()">✖</button>
+  🎵 Turn on music for a better experience
+  <button onclick="playMusic()">Play</button>
+  <button onclick="closePopup()">✖</button>
 </div>
 
 <div class="chat-app">
-    
-    <div class="chat-header-wrapper">
-        <div class="chat-header">
-            <div class="chat-header-title">ANONYMOUS GROUP CHAT</div>
-            <i class="fa-solid fa-gear settings-icon" id="settingsToggle"></i>
-            
-            <div class="dropdown-menu" id="dropdownMenu">
-                <a href="send-confession.html"><i class="fa-solid fa-paper-plane"></i> Send Confession</a>
-                <a href="public-confessions.html"><i class="fa-solid fa-users"></i> Public Confession</a>
-                <a href="home.html"><i class="fa-solid fa-comments"></i> Anonymous Chat</a>
-            </div>
-        </div>
-    </div>
 
-    <div class="messages-box" id="messagesBox"></div>
-
-    <div class="footer-fixed-wrap">
-        <!-- Changed from <form> to <div> to prevent any browser default form hiding behaviour -->
-        <div class="chat-input-area" id="chatForm">
-            <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off">
-            <button class="send-btn" id="sendBtn">Send</button>
-        </div>
-        
-        <div class="bottom-id-bar">
-            Your Anonymous ID: <span id="clientAnonymousId">#9805</span>
-        </div>
+  <!-- HEADER -->
+  <div class="chat-header-wrapper">
+    <div class="chat-header">
+      <div class="chat-header-title">ANONYMOUS GROUP CHAT</div>
+      <i class="fa-solid fa-gear settings-icon" id="settingsToggle"></i>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="send-confession.html"><i class="fa-solid fa-paper-plane"></i> Send Confession</a>
+        <a href="public-confessions.html"><i class="fa-solid fa-users"></i> Public Confessions</a>
+        <a href="home.html"><i class="fa-solid fa-comments"></i> Anonymous Chat</a>
+      </div>
     </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="messages-box" id="messagesBox">
+    <div style="text-align:center; color:rgba(255,255,255,0.3); font-size:12px; margin-top:20px;">
+      Loading messages...
+    </div>
+  </div>
+
+  <!-- FOOTER — ALWAYS VISIBLE -->
+  <div class="footer-fixed-wrap">
+    <div class="chat-input-area">
+      <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off" inputmode="text">
+      <button class="send-btn" id="sendBtn" aria-label="Send">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+    <div class="bottom-id-bar">
+      Your Anonymous ID: <span id="clientAnonymousId">#----</span>
+    </div>
+  </div>
 
 </div>
 
 <button class="music-btn" onclick="toggleMusic()">🎵</button>
-
 <audio id="music" src="home-music.mp3" loop></audio>
 
+<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import {
+    getFirestore, collection, addDoc,
+    query, orderBy, limit, onSnapshot, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
@@ -429,97 +407,101 @@ font-weight: 600;
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  let USER_ANONYMOUS_ID = localStorage.getItem("anonymousUserId");
-  if (!USER_ANONYMOUS_ID) {
-      USER_ANONYMOUS_ID = "#" + Math.floor(1000 + Math.random() * 9000);
-      localStorage.setItem("anonymousUserId", USER_ANONYMOUS_ID);
+  // Anonymous ID — persisted across sessions
+  let USER_ID = localStorage.getItem("anonymousUserId");
+  if (!USER_ID) {
+    USER_ID = "#" + Math.floor(1000 + Math.random() * 9000);
+    localStorage.setItem("anonymousUserId", USER_ID);
   }
+  document.getElementById("clientAnonymousId").innerText = USER_ID;
 
-  document.getElementById("clientAnonymousId").innerText = USER_ANONYMOUS_ID;
-
-  const inputField = document.getElementById('messageInput');
-  const messagesBox = document.getElementById('messagesBox');
-  const sendBtn = document.getElementById('sendBtn');
-
-  const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp", "asc"), limit(100));
-
-  onSnapshot(chatQuery, (snapshot) => {
-      messagesBox.innerHTML = ""; 
-      snapshot.forEach((doc) => {
-          const data = doc.data();
-          const msgDiv = document.createElement('div');
-          msgDiv.className = data.userId === USER_ANONYMOUS_ID ? 'message my-message' : 'message';
-          const formattedTime = data.timestamp
-            ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            : "Just now";
-          msgDiv.innerHTML = `
-              <div class="meta-info">
-                  <span class="username">${escapeHTML(data.user)}</span>
-                  <span class="timestamp">${formattedTime}</span>
-              </div>
-              <p>${escapeHTML(data.text)}</p>
-          `;
-          messagesBox.appendChild(msgDiv);
-      });
-      messagesBox.scrollTop = messagesBox.scrollHeight;
-  });
-
-  async function sendMessage() {
-      const rawText = inputField.value.trim();
-      if (!rawText) return;
-      try {
-          await addDoc(collection(db, "group_chat"), {
-              user: `Anonymous ${USER_ANONYMOUS_ID}`,
-              userId: USER_ANONYMOUS_ID,
-              text: rawText,
-              timestamp: serverTimestamp()
-          });
-          inputField.value = '';
-      } catch (err) {
-          console.error("Firebase write error:", err);
-      }
-  }
-
-  sendBtn.addEventListener('click', sendMessage);
-
-  inputField.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') sendMessage();
-  });
+  const inputField  = document.getElementById("messageInput");
+  const sendBtn     = document.getElementById("sendBtn");
+  const messagesBox = document.getElementById("messagesBox");
 
   function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-          tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+    return str.replace(/[&<>'"]/g,
+      t => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[t] || t));
   }
+
+  // Live messages
+  const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp","asc"), limit(100));
+  onSnapshot(chatQuery, (snapshot) => {
+    messagesBox.innerHTML = "";
+    snapshot.forEach((doc) => {
+      const d = doc.data();
+      const div = document.createElement("div");
+      div.className = d.userId === USER_ID ? "message my-message" : "message";
+      const t = d.timestamp ? new Date(d.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : "Just now";
+      div.innerHTML = `
+        <div class="meta-info">
+          <span class="username">Anon ${escapeHTML(d.userId || "")}</span>
+          <span class="timestamp">${t}</span>
+        </div>
+        <p>${escapeHTML(d.text)}</p>`;
+      messagesBox.appendChild(div);
+    });
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+  });
+
+  // Send message — works on click AND enter key
+  async function sendMessage() {
+    const text = inputField.value.trim();
+    if (!text) return;
+    inputField.value = "";
+    try {
+      await addDoc(collection(db, "group_chat"), {
+        user: `Anonymous ${USER_ID}`,
+        userId: USER_ID,
+        text: text,
+        timestamp: serverTimestamp()
+      });
+    } catch (e) {
+      console.error("Send error:", e);
+    }
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+
+  inputField.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Keep input visible when keyboard opens on mobile
+  inputField.addEventListener("focus", () => {
+    setTimeout(() => {
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+    }, 400);
+  });
 </script>
 
+<!-- UI SCRIPTS -->
 <script>
-const settingsToggle = document.getElementById('settingsToggle');
-const dropdownMenu = document.getElementById('dropdownMenu');
+const settingsToggle = document.getElementById("settingsToggle");
+const dropdownMenu   = document.getElementById("dropdownMenu");
 
-settingsToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdownMenu.classList.toggle('active');
+settingsToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  dropdownMenu.classList.toggle("active");
 });
 
-window.addEventListener('click', () => {
-    if (window.innerWidth <= 768 && dropdownMenu.classList.contains('active')) {
-        dropdownMenu.classList.remove('active');
-    }
+window.addEventListener("click", () => {
+  if (window.innerWidth <= 768) dropdownMenu.classList.remove("active");
 });
 
-function toggleMusic(){
-    const music = document.getElementById("music");
-    if(music.paused){ music.play(); } else { music.pause(); }
+function toggleMusic() {
+  const m = document.getElementById("music");
+  m.paused ? m.play() : m.pause();
 }
-
-function playMusic(){
-    document.getElementById("music").play();
-    document.getElementById("musicPopup").style.display="none";
+function playMusic() {
+  document.getElementById("music").play();
+  document.getElementById("musicPopup").style.display = "none";
 }
-
-function closePopup(){
-    document.getElementById("musicPopup").style.display="none";
+function closePopup() {
+  document.getElementById("musicPopup").style.display = "none";
 }
 </script>
 
