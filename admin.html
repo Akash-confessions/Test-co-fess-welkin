@@ -3,713 +3,1007 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welkin — Admin Panel</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>Welkin Admin Panel</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap');
+
   :root {
-    --bg:        #080c10;
-    --surface:   #0d1117;
-    --card:      #111820;
-    --border:    rgba(0,191,255,.12);
-    --border2:   rgba(0,191,255,.25);
-    --accent:    #00bfff;
-    --accent2:   #0077aa;
-    --green:     #00e676;
-    --red:       #ff4444;
-    --yellow:    #ffaa00;
-    --text:      #e6f0f8;
-    --muted:     rgba(230,240,248,.45);
-    --mono:      'JetBrains Mono', monospace;
-    --sans:      'Inter', sans-serif;
+    --bg:        #080b14;
+    --surface:   #0d1120;
+    --panel:     #111827;
+    --border:    rgba(255,255,255,0.07);
+    --accent:    #00c6ff;
+    --purple:    #a855f7;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --yellow:    #f59e0b;
+    --text:      #e2e8f0;
+    --muted:     rgba(226,232,240,0.45);
+    --radius:    14px;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
+    font-family: 'Inter', sans-serif;
     background: var(--bg);
     color: var(--text);
-    font-family: var(--sans);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* ── GRID BG ── */
-  body::before {
-    content:'';
-    position:fixed;
-    inset:0;
-    background-image:
-      linear-gradient(rgba(0,191,255,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,191,255,.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events:none;
-    z-index:0;
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    position: fixed; inset:0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(0,198,255,0.12) 0%, var(--bg) 65%);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
   }
 
-  /* ══════════════════════════════════════════
-     ACCESS CODE GATE
-  ══════════════════════════════════════════ */
-  #accessGate {
-    position:fixed;
-    inset:0;
-    background: var(--bg);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-  }
-
-  .gate-logo {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(0,191,255,.6);
-    margin-bottom: 8px;
-  }
-
-  .gate-sub {
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--muted);
-    margin-bottom: 48px;
-  }
-
-  .gate-box {
-    background: var(--card);
+  .login-card {
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 36px 40px;
-    width: 340px;
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 380px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-card::before {
+    content:'';
+    position: absolute;
+    top:-40px; left:50%;
+    transform: translateX(-50%);
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(0,198,255,0.18), transparent 70%);
+    border-radius: 50%;
+  }
+
+  .login-logo {
     text-align: center;
+    margin-bottom: 32px;
+    position: relative;
   }
 
-  .gate-box h2 {
-    font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 3px;
-    color: var(--muted);
-    margin-bottom: 24px;
+  .login-logo .logo-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #00c6ff, #a855f7);
+    border-radius: 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 24px rgba(0,198,255,0.3);
   }
 
-  .gate-input {
-    width: 100%;
-    background: rgba(0,191,255,.05);
+  .login-logo h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #00c6ff, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .login-logo p { font-size: 12px; color: var(--muted); margin-top:4px; }
+
+  .login-field { margin-bottom: 16px; }
+  .login-field label { display: block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .login-field input {
+    width:100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.06);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 14px 18px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 18px;
-    letter-spacing: 6px;
-    text-align: center;
+    color: #fff;
+    font-size: 14px;
     outline: none;
-    margin-bottom: 20px;
-    transition: border .2s;
+    transition: border-color 0.2s;
   }
 
-  .gate-input:focus { border-color: var(--accent); }
+  .login-field input:focus { border-color: var(--accent); }
 
-  .gate-btn {
+  .login-btn {
     width: 100%;
     padding: 13px;
-    background: var(--accent);
-    border: none;
-    border-radius: 10px;
-    color: #000;
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 2px;
+    background: linear-gradient(90deg, #00c6ff, #0066ff);
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 15px; font-weight: 700;
     cursor: pointer;
-    transition: opacity .2s;
+    margin-top: 8px;
+    transition: opacity 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
   }
 
-  .gate-btn:hover { opacity:.85; }
+  .login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .login-error { color: var(--red); font-size: 12px; text-align:center; margin-top:10px; display:none; }
 
-  .gate-err {
-    margin-top: 14px;
-    font-size: 12px;
-    color: var(--red);
-    font-family: var(--mono);
-    display: none;
+  /* ── SIDEBAR ── */
+  #adminApp { display:none; min-height:100vh; }
+
+  .layout { display:flex; min-height:100vh; }
+
+  .sidebar {
+    width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top:0; left:0; bottom:0;
+    z-index: 100;
+    transition: transform 0.3s;
   }
 
-  /* ══════════════════════════════════════════
-     MAIN LAYOUT
-  ══════════════════════════════════════════ */
-  #adminApp { display:none; position:relative; z-index:1; }
-
-  /* ── TOP BAR ── */
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 200;
-    background: rgba(8,12,16,.92);
-    backdrop-filter: blur(16px);
+  .sidebar-logo {
+    padding: 24px 20px 20px;
     border-bottom: 1px solid var(--border);
-    padding: 0 28px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; gap: 12px;
   }
 
-  .topbar-left {
+  .sidebar-logo .icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #00c6ff, #a855f7);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700;
+    background: linear-gradient(135deg, #00c6ff, #a855f7);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+
+  .sidebar-logo p { font-size:10px; color:var(--muted); }
+
+  nav { flex:1; padding: 14px 10px; overflow-y:auto; }
+
+  .nav-section-label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 10px 10px 6px;
+  }
+
+  nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+
+  nav a i { width: 18px; text-align:center; }
+
+  nav a:hover, nav a.active {
+    background: rgba(0,198,255,0.1);
+    color: var(--accent);
+  }
+
+  nav a .badge {
+    margin-left: auto;
+    background: var(--red);
+    color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 20px;
+    min-width: 20px; text-align:center;
+  }
+
+  .sidebar-footer {
+    padding: 14px 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .sidebar-footer a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--red);
+    text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  .sidebar-footer a:hover { background: rgba(239,68,68,0.1); }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
   }
 
-  .topbar-title {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 3px;
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top:0; z-index:50;
+  }
+
+  .topbar h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--text);
+  }
+
+  .topbar-right { display:flex; align-items:center; gap:16px; }
+
+  .admin-badge {
+    background: linear-gradient(90deg, rgba(0,198,255,0.15), rgba(168,85,247,0.15));
+    border: 1px solid rgba(0,198,255,0.3);
     color: var(--accent);
+    font-size: 12px; font-weight: 600;
+    padding: 5px 14px; border-radius: 20px;
+    display: flex; align-items: center; gap: 6px;
   }
 
-  .topbar-sub {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-  }
-
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--green);
-    background: rgba(0,230,118,.08);
-    border: 1px solid rgba(0,230,118,.2);
-    border-radius: 50px;
-    padding: 6px 16px;
-  }
-
-  .live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: blink 1.2s infinite;
-  }
-
-  @keyframes blink {
-    0%,100% { opacity:1; box-shadow:0 0 6px var(--green); }
-    50%      { opacity:.2; box-shadow:none; }
-  }
+  .content { padding: 28px; flex:1; }
 
   /* ── TABS ── */
-  .tabs {
-    display: flex;
-    gap: 4px;
-    padding: 16px 28px 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    overflow-x: auto;
-  }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
 
-  .tab-btn {
-    padding: 10px 22px;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all .2s;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .tab-btn:hover { color: var(--text); }
-
-  .tab-btn.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-
-  .tab-badge {
-    background: var(--accent);
-    color: #000;
-    font-size: 9px;
-    font-weight: 700;
-    border-radius: 50px;
-    padding: 2px 7px;
-    min-width: 20px;
-    text-align: center;
-  }
-
-  /* ── PANELS ── */
-  .panel { display:none; padding: 28px; max-width: 1100px; margin: 0 auto; }
-  .panel.active { display:block; }
-
-  /* ── SECTION HEADER ── */
-  .section-hd {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--muted);
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-hd i { color: var(--accent); }
-
-  /* ── CONFESSION CARD ── */
-  .confession-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 22px 24px;
-    margin-bottom: 16px;
-    transition: border .2s;
-  }
-
-  .confession-card:hover { border-color: var(--border2); }
-
-  .cc-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .cc-user {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .cc-time {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-  }
-
-  .cc-status {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 3px 10px;
-    border-radius: 50px;
-  }
-
-  .status-pending  { background:rgba(255,170,0,.12); color:var(--yellow); border:1px solid rgba(255,170,0,.3); }
-  .status-approved { background:rgba(0,230,118,.10); color:var(--green);  border:1px solid rgba(0,230,118,.3); }
-  .status-rejected { background:rgba(255,68,68,.10);  color:var(--red);    border:1px solid rgba(255,68,68,.3); }
-
-  .cc-text {
-    font-size: 14px;
-    line-height: 1.75;
-    color: var(--text);
-    margin-bottom: 16px;
-  }
-
-  .cc-caption-area {
-    margin-bottom: 14px;
-  }
-
-  .cc-caption-input {
-    width: 100%;
-    background: rgba(0,191,255,.05);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 13px;
-    resize: vertical;
-    min-height: 70px;
-    outline: none;
-    transition: border .2s;
-  }
-
-  .cc-caption-input:focus { border-color: var(--accent); }
-  .cc-caption-input::placeholder { color: var(--muted); }
-
-  .cc-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    padding: 9px 18px;
-    border-radius: 9px;
-    border: none;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: opacity .15s, transform .1s;
-  }
-
-  .btn:hover   { opacity:.85; }
-  .btn:active  { transform:scale(.97); }
-
-  .btn-approve { background: rgba(0,230,118,.15); color:var(--green);  border:1px solid rgba(0,230,118,.3); }
-  .btn-reject  { background: rgba(255,170,0,.12); color:var(--yellow); border:1px solid rgba(255,170,0,.3); }
-  .btn-delete  { background: rgba(255,68,68,.12);  color:var(--red);    border:1px solid rgba(255,68,68,.3); }
-  .btn-caption { background: rgba(0,191,255,.1);   color:var(--accent); border:1px solid var(--border2); }
-  .btn-sm      { padding:6px 12px; font-size:10px; }
-
-  /* ── STATS GRID ── */
+  /* ── STAT CARDS ── */
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 16px;
     margin-bottom: 28px;
   }
 
   .stat-card {
-    background: var(--card);
+    background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px 22px;
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
   }
 
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: var(--muted);
-    margin-bottom: 10px;
+  .stat-card:hover { transform: translateY(-2px); }
+
+  .stat-card::after {
+    content:'';
+    position: absolute; top:0; left:0; right:0; height:2px;
   }
 
-  .stat-value {
-    font-family: var(--mono);
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--accent);
-  }
+  .stat-card.blue::after   { background: var(--accent); }
+  .stat-card.purple::after { background: var(--purple); }
+  .stat-card.green::after  { background: var(--green); }
+  .stat-card.red::after    { background: var(--red); }
+  .stat-card.yellow::after { background: var(--yellow); }
 
-  .stat-sub {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 4px;
+  .stat-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+  .stat-value { font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; color:var(--text); }
+  .stat-icon {
+    position: absolute; right:16px; top:16px;
+    font-size: 20px; opacity:0.15;
   }
 
   /* ── TABLE ── */
-  .data-table {
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .card-header h3 { font-size:14px; font-weight:700; color:var(--text); }
+
+  .search-bar {
+    display: flex; gap:10px; align-items:center;
+  }
+
+  .search-bar input {
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.2s;
+  }
+
+  .search-bar input:focus { border-color: var(--accent); }
+
+  .table-wrap { overflow-x: auto; }
+
+  table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
   }
 
-  .data-table th {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--muted);
+  thead th {
     text-align: left;
-    padding: 10px 14px;
+    font-size: 11px; font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
   }
 
-  .data-table td {
-    padding: 14px;
-    border-bottom: 1px solid rgba(0,191,255,.05);
-    vertical-align: top;
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
   }
 
-  .data-table tr:last-child td { border-bottom: none; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-  .data-table tr:hover td { background: rgba(0,191,255,.03); }
-
-  .mono-cell {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent);
+  td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
   }
 
-  .table-wrap {
-    background: var(--card);
+  /* ── BADGES / PILLS ── */
+  .pill {
+    display: inline-flex; align-items:center; gap:5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+
+  .pill.pending  { background:rgba(245,158,11,0.15); color:var(--yellow); border:1px solid rgba(245,158,11,0.3); }
+  .pill.approved { background:rgba(34,197,94,0.12); color:var(--green);  border:1px solid rgba(34,197,94,0.3); }
+  .pill.rejected { background:rgba(239,68,68,0.12); color:var(--red);    border:1px solid rgba(239,68,68,0.3); }
+  .pill.banned   { background:rgba(239,68,68,0.2);  color:var(--red);    border:1px solid rgba(239,68,68,0.5); }
+  .pill.active   { background:rgba(34,197,94,0.12); color:var(--green);  border:1px solid rgba(34,197,94,0.3); }
+  .pill.admin    { background:rgba(168,85,247,0.15); color:var(--purple); border:1px solid rgba(168,85,247,0.3); }
+
+  /* ── ACTION BUTTONS ── */
+  .btn-group { display:flex; gap:6px; flex-wrap:wrap; }
+
+  .btn {
+    padding: 5px 12px;
+    border-radius: 7px;
+    border: none;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    display: inline-flex; align-items:center; gap:5px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.95); }
+
+  .btn-approve { background:rgba(34,197,94,0.15);  color:var(--green);  border:1px solid rgba(34,197,94,0.3); }
+  .btn-reject  { background:rgba(245,158,11,0.15); color:var(--yellow); border:1px solid rgba(245,158,11,0.3); }
+  .btn-delete  { background:rgba(239,68,68,0.15);  color:var(--red);    border:1px solid rgba(239,68,68,0.3); }
+  .btn-ban     { background:rgba(239,68,68,0.25);  color:var(--red);    border:1px solid rgba(239,68,68,0.5); }
+  .btn-unban   { background:rgba(34,197,94,0.15);  color:var(--green);  border:1px solid rgba(34,197,94,0.3); }
+  .btn-info    { background:rgba(0,198,255,0.12);  color:var(--accent); border:1px solid rgba(0,198,255,0.3); }
+
+  .btn:hover { opacity: 0.8; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset:0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: none; align-items: center; justify-content: center;
+  }
+
+  .modal-overlay.open { display:flex; }
+
+  .modal {
+    background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    overflow-x: auto;
+    border-radius: 20px;
+    padding: 28px 32px;
+    width: 480px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
   }
 
-  /* ── CHAT MESSAGES ── */
-  .chat-msg {
-    background: var(--card);
+  .modal h3 {
+    font-family:'Space Grotesk',sans-serif;
+    font-size:17px; font-weight:700;
+    margin-bottom: 18px;
+    display:flex; align-items:center; gap:10px;
+  }
+
+  .modal-field { margin-bottom:14px; }
+  .modal-field label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px; }
+  .modal-field p { font-size:14px; color:var(--text); line-height:1.6; word-break:break-word; }
+  .modal-field .val { font-size:14px; color:var(--accent); font-weight:600; }
+
+  .modal-actions {
+    display:flex; gap:10px; justify-content:flex-end;
+    margin-top:22px; flex-wrap:wrap;
+  }
+
+  .modal-close {
+    padding: 8px 18px;
+    background: rgba(255,255,255,0.07);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size:13px; font-weight:600;
+    cursor:pointer; transition: background 0.2s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.12); }
+
+  /* ── SEND MESSAGE PANEL ── */
+  .send-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .send-panel h3 { font-size:15px; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  .form-group label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px; }
+  .form-group input, .form-group textarea, .form-group select {
+    width:100%;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    outline:none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+
+  .form-group textarea { resize: vertical; min-height:90px; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--panel); }
+
+  .btn-primary {
+    padding: 10px 24px;
+    background: linear-gradient(90deg, #00c6ff, #0066ff);
+    border:none; border-radius:8px;
+    color:#fff; font-size:14px; font-weight:700;
+    cursor:pointer; transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover { opacity:0.85; }
+
+  /* ── VISITOR CARDS ── */
+  .visitor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
   }
 
-  .chat-msg-left { flex:1; }
-
-  .chat-msg-user {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    margin-bottom: 6px;
+  .visitor-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
   }
 
-  .chat-msg-text {
-    font-size: 14px;
-    line-height: 1.6;
+  .visitor-card::before {
+    content:'';
+    position: absolute; left:0; top:0; bottom:0; width:3px;
+    background: linear-gradient(180deg, var(--accent), var(--purple));
   }
 
-  .chat-msg-time {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+  .visitor-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .visitor-roll { font-size:12px; color:var(--accent); font-weight:600; margin-bottom:10px; }
 
-  /* ── VISITORS ── */
-  .visitor-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 18px;
-    border-bottom: 1px solid rgba(0,191,255,.06);
-  }
+  .visitor-meta { display:flex; flex-direction:column; gap:5px; }
+  .visitor-meta-row { display:flex; gap:8px; align-items:center; font-size:12px; color:var(--muted); }
+  .visitor-meta-row i { width:14px; color:var(--accent); font-size:11px; }
 
-  .visitor-row:last-child { border-bottom: none; }
+  .visitor-actions { margin-top:12px; display:flex; gap:8px; }
 
-  .visitor-device {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .visitor-count {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  /* ── EMPTY ── */
+  /* ── EMPTY STATE ── */
   .empty-state {
-    text-align: center;
+    text-align:center;
     padding: 60px 20px;
     color: var(--muted);
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1px;
   }
 
-  .empty-state i {
-    font-size: 32px;
-    margin-bottom: 16px;
-    display: block;
-    color: var(--border2);
-  }
+  .empty-state i { font-size:40px; margin-bottom:12px; opacity:0.3; }
+  .empty-state p { font-size:14px; }
 
   /* ── TOAST ── */
   #toast {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    background: var(--card);
-    border: 1px solid var(--border2);
+    position: fixed; bottom:28px; right:28px;
+    background: var(--panel);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 14px 22px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent);
+    padding: 14px 20px;
+    font-size:13px; font-weight:600;
+    color: var(--text);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display:none;
+    align-items:center; gap:10px;
     z-index: 9999;
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all .3s;
-    letter-spacing: 1px;
+    max-width: 300px;
+    animation: slideIn 0.3s ease;
   }
 
-  #toast.show { transform:translateY(0); opacity:1; }
-
-  /* ── BAN BADGE ── */
-  .banned-badge {
-    background: rgba(255,68,68,.15);
-    color: var(--red);
-    border: 1px solid rgba(255,68,68,.3);
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 1px;
-    padding: 2px 8px;
-    border-radius: 50px;
-    margin-left: 8px;
+  @keyframes slideIn {
+    from { transform: translateY(20px); opacity:0; }
+    to   { transform: translateY(0);    opacity:1; }
   }
+
+  #toast.show { display:flex; }
+  #toast.success { border-color: rgba(34,197,94,0.4); }
+  #toast.error   { border-color: rgba(239,68,68,0.4); }
+
+  /* ── DIVIDER ── */
+  .divider { height:1px; background:var(--border); margin:20px 0; }
 
   /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width:5px; height:5px; }
-  ::-webkit-scrollbar-track { background:transparent; }
-  ::-webkit-scrollbar-thumb { background:rgba(0,191,255,.2); border-radius:10px; }
+  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:10px; }
 
-  @media(max-width:600px) {
-    .topbar { padding:0 16px; }
-    .tabs   { padding:12px 16px 0; }
-    .panel  { padding:16px; }
-    .cc-actions { flex-direction:column; }
-    .btn    { justify-content:center; }
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left:0; }
+    .form-row { grid-template-columns:1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .mobile-menu-btn {
+    display:none;
+    background:none; border:none;
+    color:var(--text); font-size:20px; cursor:pointer;
+  }
+
+  @media (max-width:768px) { .mobile-menu-btn { display:block; } }
+
+  .chat-msg-preview {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--muted);
+    font-size: 12px;
   }
 </style>
 </head>
 <body>
 
-<!-- ══ ACCESS GATE ══ -->
-<div id="accessGate">
-  <div class="gate-logo">WELKIN</div>
-  <div class="gate-sub">SECURE ADMIN ACCESS</div>
-  <div class="gate-box">
-    <h2>ENTER ACCESS CODE</h2>
-    <input class="gate-input" id="accessInput" type="password" maxlength="10" placeholder="••••••" />
-    <button class="gate-btn" onclick="checkAccess()">UNLOCK</button>
-    <div class="gate-err" id="gateErr">✕ INVALID ACCESS CODE</div>
+<!-- ────────────────── LOGIN ────────────────── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">⚡</div>
+      <h1>Welkin Admin</h1>
+      <p>Restricted access — authorised personnel only</p>
+    </div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Enter password">
+    </div>
+    <button class="login-btn" onclick="doLogin()">
+      <i class="fa-solid fa-lock-open"></i> Sign In
+    </button>
+    <div class="login-error" id="loginError">Invalid credentials. Try again.</div>
   </div>
 </div>
 
-<!-- ══ ADMIN APP ══ -->
+<!-- ────────────────── ADMIN APP ────────────────── -->
 <div id="adminApp">
+<div class="layout">
 
-  <!-- TOP BAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-title">WELKIN CONFESSIONS</div>
-      <div class="topbar-sub">ADMIN CONTROL PANEL</div>
-    </div>
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      LIVE TRACKING
-    </div>
-  </div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('confessions',this)">
-      <i class="fa-solid fa-scroll"></i> CONFESSIONS
-      <span class="tab-badge" id="pendingBadge">0</span>
-    </button>
-    <button class="tab-btn" onclick="switchTab('approved',this)">
-      <i class="fa-solid fa-check-circle"></i> APPROVED
-    </button>
-    <button class="tab-btn" onclick="switchTab('chat',this)">
-      <i class="fa-solid fa-comments"></i> CHAT MESSAGES
-    </button>
-    <button class="tab-btn" onclick="switchTab('logs',this)">
-      <i class="fa-solid fa-user-clock"></i> LOGIN LOGS
-    </button>
-    <button class="tab-btn" onclick="switchTab('visitors',this)">
-      <i class="fa-solid fa-chart-line"></i> VISITORS
-    </button>
-  </div>
-
-  <!-- ══ CONFESSIONS PANEL ══ -->
-  <div class="panel active" id="panel-confessions">
-    <div class="section-hd"><i class="fa-solid fa-clock"></i> PENDING CONFESSIONS</div>
-    <div id="pendingList"></div>
-  </div>
-
-  <!-- ══ APPROVED PANEL ══ -->
-  <div class="panel" id="panel-approved">
-    <div class="section-hd"><i class="fa-solid fa-check"></i> APPROVED CONFESSIONS</div>
-    <div id="approvedList"></div>
-  </div>
-
-  <!-- ══ CHAT PANEL ══ -->
-  <div class="panel" id="panel-chat">
-    <div class="section-hd"><i class="fa-solid fa-comments"></i> ANONYMOUS CHAT MESSAGES</div>
-    <div id="chatList"></div>
-  </div>
-
-  <!-- ══ LOGS PANEL ══ -->
-  <div class="panel" id="panel-logs">
-    <div class="stats-grid" id="logStats">
-      <div class="stat-card">
-        <div class="stat-label">TOTAL LOGINS</div>
-        <div class="stat-value" id="totalLogins">—</div>
-        <div class="stat-sub">all time</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">UNIQUE USERS</div>
-        <div class="stat-value" id="uniqueUsers">—</div>
-        <div class="stat-sub">distinct accounts</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon">⚡</div>
+      <div>
+        <h2>Welkin Admin</h2>
+        <p>Control Panel v2.0</p>
       </div>
     </div>
-    <div class="section-hd"><i class="fa-solid fa-list"></i> LOGIN HISTORY</div>
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>USERNAME</th>
-            <th>ROLE</th>
-            <th>TIMESTAMP</th>
-            <th>DEVICE</th>
-          </tr>
-        </thead>
-        <tbody id="logTable"></tbody>
-      </table>
+
+    <nav>
+      <div class="nav-section-label">Overview</div>
+      <a href="#" class="active" onclick="showTab('dashboard',this)">
+        <i class="fa-solid fa-chart-pie"></i> Dashboard
+      </a>
+
+      <div class="nav-section-label">Moderation</div>
+      <a href="#" onclick="showTab('confessions',this)">
+        <i class="fa-solid fa-scroll"></i> Confessions
+        <span class="badge" id="pendingBadge">0</span>
+      </a>
+      <a href="#" onclick="showTab('chat',this)">
+        <i class="fa-solid fa-comments"></i> Group Chat
+      </a>
+      <a href="#" onclick="showTab('banned',this)">
+        <i class="fa-solid fa-ban"></i> Banned Users
+      </a>
+
+      <div class="nav-section-label">Users</div>
+      <a href="#" onclick="showTab('users',this)">
+        <i class="fa-solid fa-users"></i> All Users
+      </a>
+      <a href="#" onclick="showTab('visitors',this)">
+        <i class="fa-solid fa-eye"></i> Visitors & Sessions
+      </a>
+
+      <div class="nav-section-label">Tools</div>
+      <a href="#" onclick="showTab('broadcast',this)">
+        <i class="fa-solid fa-bullhorn"></i> Broadcast Message
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="admin-badge"><i class="fa-solid fa-shield-halved"></i> Admin</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="tab-pane active" id="tab-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-label">Total Messages</div>
+            <div class="stat-value" id="stat-msgs">—</div>
+            <i class="fa-solid fa-message stat-icon"></i>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-label">Confessions</div>
+            <div class="stat-value" id="stat-confessions">—</div>
+            <i class="fa-solid fa-scroll stat-icon"></i>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-label">Pending Review</div>
+            <div class="stat-value" id="stat-pending">—</div>
+            <i class="fa-solid fa-clock stat-icon"></i>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Unique Users</div>
+            <div class="stat-value" id="stat-users">—</div>
+            <i class="fa-solid fa-user-group stat-icon"></i>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">Banned Users</div>
+            <div class="stat-value" id="stat-banned">—</div>
+            <i class="fa-solid fa-ban stat-icon"></i>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent);margin-right:6px;"></i> Recent Activity</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>User / ID</th>
+                  <th>Content</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="recentActivity">
+                <tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CONFESSIONS ── -->
+      <div class="tab-pane" id="tab-confessions">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-scroll" style="color:var(--purple);margin-right:6px;"></i> All Confessions</h3>
+            <div class="search-bar">
+              <input type="text" placeholder="Search confessions…" oninput="filterConfessions(this.value)" id="confSearch">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Roll No.</th>
+                  <th>Message</th>
+                  <th>Status</th>
+                  <th>Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="confessionsList">
+                <tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GROUP CHAT ── -->
+      <div class="tab-pane" id="tab-chat">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-comments" style="color:var(--accent);margin-right:6px;"></i> Group Chat Messages</h3>
+            <div class="search-bar">
+              <input type="text" placeholder="Search messages…" oninput="filterChat(this.value)">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Anon ID</th>
+                  <th>Message</th>
+                  <th>Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="chatList">
+                <tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BANNED USERS ── -->
+      <div class="tab-pane" id="tab-banned">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-ban" style="color:var(--red);margin-right:6px;"></i> Banned Users</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Anon ID</th>
+                  <th>Reason</th>
+                  <th>Banned At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bannedList">
+                <tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── USERS ── -->
+      <div class="tab-pane" id="tab-users">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-users" style="color:var(--green);margin-right:6px;"></i> Registered Users</h3>
+            <div class="search-bar">
+              <input type="text" placeholder="Search by name or roll no…" oninput="filterUsers(this.value)">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Roll No.</th>
+                  <th>Anon ID</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersList">
+                <tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── VISITORS ── -->
+      <div class="tab-pane" id="tab-visitors">
+        <div class="stats-grid" style="margin-bottom:20px;">
+          <div class="stat-card blue">
+            <div class="stat-label">Total Visits</div>
+            <div class="stat-value" id="stat-visits">—</div>
+            <i class="fa-solid fa-eye stat-icon"></i>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Active Today</div>
+            <div class="stat-value" id="stat-today">—</div>
+            <i class="fa-solid fa-calendar-day stat-icon"></i>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-label">Devices Tracked</div>
+            <div class="stat-value" id="stat-devices">—</div>
+            <i class="fa-solid fa-mobile-screen stat-icon"></i>
+          </div>
+        </div>
+
+        <div class="visitor-grid" id="visitorGrid">
+          <div class="empty-state" style="grid-column:1/-1">
+            <i class="fa-solid fa-spinner fa-spin"></i><p>Loading sessions…</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BROADCAST ── -->
+      <div class="tab-pane" id="tab-broadcast">
+        <div class="send-panel">
+          <h3><i class="fa-solid fa-bullhorn" style="color:var(--yellow);"></i> Send Message to User</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Target Roll Number</label>
+              <input type="text" id="bc-roll" placeholder="e.g. 2023-CS-001">
+            </div>
+            <div class="form-group">
+              <label>Message Type</label>
+              <select id="bc-type">
+                <option value="info">ℹ️ Info</option>
+                <option value="warning">⚠️ Warning</option>
+                <option value="banned">🚫 Ban Notice</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:16px;">
+            <label>Your Message</label>
+            <textarea id="bc-msg" placeholder="Type your message to the user…"></textarea>
+          </div>
+          <button class="btn-primary" onclick="sendAdminMessage()">
+            <i class="fa-solid fa-paper-plane"></i> Send Message
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-envelope-open-text" style="color:var(--accent);margin-right:6px;"></i> Sent Admin Messages</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Roll No.</th>
+                  <th>Type</th>
+                  <th>Message</th>
+                  <th>Sent At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="msgList">
+                <tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+</div><!-- /adminApp -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<!-- BAN REASON MODAL -->
+<div class="modal-overlay" id="banModalOverlay">
+  <div class="modal">
+    <h3><i class="fa-solid fa-ban" style="color:var(--red);"></i> Ban User</h3>
+    <div class="modal-field">
+      <label>Anonymous ID</label>
+      <div class="val" id="banTargetId"></div>
+    </div>
+    <div class="form-group">
+      <label>Ban Reason</label>
+      <textarea id="banReason" placeholder="Reason for ban (optional)…" style="min-height:80px;width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-close" onclick="closeBanModal()">Cancel</button>
+      <button class="btn btn-ban" onclick="confirmBan()"><i class="fa-solid fa-ban"></i> Confirm Ban</button>
     </div>
   </div>
-
-  <!-- ══ VISITORS PANEL ══ -->
-  <div class="panel" id="panel-visitors">
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">TOTAL VISITS</div>
-        <div class="stat-value" id="totalVisits">—</div>
-        <div class="stat-sub">unique device hits</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">TODAY</div>
-        <div class="stat-value" id="todayVisits">—</div>
-        <div class="stat-sub">visits today</div>
-      </div>
-    </div>
-    <div class="section-hd"><i class="fa-solid fa-desktop"></i> BY DEVICE / BROWSER</div>
-    <div class="table-wrap" id="visitorTable">
-      <div class="empty-state"><i class="fa-solid fa-chart-bar"></i>Loading visitor data...</div>
-    </div>
-  </div>
-
 </div>
 
 <!-- TOAST -->
-<div id="toast"></div>
+<div id="toast"><span id="toastMsg"></span></div>
 
-<!-- ══ FIREBASE ══ -->
+<!-- LOGIN SCRIPT (plain, not module — so onclick works) -->
+<script>
+  // ── Admin credentials (change these!)
+  const ADMIN_CREDS = [
+    { user: "admin",  pass: "war" },
+    { user: "owner",  pass: "war" }
+  ];
+
+  function doLogin() {
+    const u = document.getElementById("loginUser").value.trim();
+    const p = document.getElementById("loginPass").value.trim();
+    const ok = ADMIN_CREDS.some(c => c.user === u && c.pass === p);
+    if (ok) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("adminApp").style.display = "block";
+      window._currentAdmin = u;
+      if (typeof loadAll === "function") loadAll();
+      else window._loginPending = true;
+    } else {
+      const el = document.getElementById("loginError");
+      el.style.display = "block";
+      setTimeout(() => el.style.display = "none", 3000);
+    }
+  }
+
+  function logout() {
+    document.getElementById("adminApp").style.display = "none";
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("loginUser").value = "";
+    document.getElementById("loginPass").value = "";
+  }
+
+  // Enter key support
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("loginPass").addEventListener("keydown", e => {
+      if (e.key === "Enter") doLogin();
+    });
+    document.getElementById("loginUser").addEventListener("keydown", e => {
+      if (e.key === "Enter") document.getElementById("loginPass").focus();
+    });
+  });
+</script>
+
+<!-- FIREBASE + SCRIPTS -->
 <script type="module">
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore, collection, query, where, orderBy,
-  onSnapshot, doc, updateDoc, deleteDoc, getDocs,
-  addDoc, serverTimestamp, limit
+  getFirestore, collection, addDoc, getDocs, deleteDoc,
+  doc, updateDoc, query, orderBy, limit, onSnapshot,
+  serverTimestamp, setDoc, getDoc, where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -724,317 +1018,519 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-// ── Helpers ──────────────────────────────────────
-function toast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2800);
+// Expose db globally
+window._db = db;
+window._col = collection;
+window._addDoc = addDoc;
+window._getDocs = getDocs;
+window._deleteDoc = deleteDoc;
+window._doc = doc;
+window._updateDoc = updateDoc;
+window._query = query;
+window._orderBy = orderBy;
+window._limit = limit;
+window._onSnapshot = onSnapshot;
+window._serverTimestamp = serverTimestamp;
+window._setDoc = setDoc;
+window._getDoc = getDoc;
+window._where = where;
+
+// ── DATA CACHE
+let allConfessions = [];
+let allChat        = [];
+let allUsers       = [];
+let allBanned      = [];
+let allVisitors    = [];
+let allMsgs        = [];
+let pendingBanId   = null;
+
+window.loadAll = function() {
+  loadConfessions();
+  loadChat();
+  loadBanned();
+  loadUsers();
+  loadVisitors();
+  loadAdminMsgs();
 }
 
-function fmt(ts) {
-  if (!ts) return "—";
-  const d = ts.toDate();
-  return d.toLocaleString("en-US",{
-    month:"short", day:"numeric",
-    hour:"2-digit", minute:"2-digit"
+// ── CONFESSIONS
+async function loadConfessions() {
+  const q = _query(_col(_db,"confessions"), _orderBy("timestamp","desc"));
+  _onSnapshot(q, snap => {
+    allConfessions = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderConfessions(allConfessions);
+    updateStats();
   });
 }
 
-function timeAgo(ts) {
-  if (!ts) return "";
-  const s = Math.floor((Date.now() - ts.toDate().getTime())/1000);
-  if (s < 60)   return `${s}s ago`;
-  if (s < 3600)  return `${Math.floor(s/60)}m ago`;
-  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
-  return `${Math.floor(s/86400)}d ago`;
+function renderConfessions(list) {
+  const tbody = document.getElementById("confessionsList");
+  if (!list.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-scroll"></i><p>No confessions yet.</p></div></td></tr>`; return; }
+  document.getElementById("pendingBadge").textContent = list.filter(c=>c.status==="pending"||!c.status).length;
+  tbody.innerHTML = list.map(c => {
+    const st = c.status || "pending";
+    const ts = c.timestamp ? new Date(c.timestamp.toDate()).toLocaleString() : "—";
+    return `<tr>
+      <td><b style="color:var(--accent)">${esc(c.rollNumber||c.roll||"N/A")}</b></td>
+      <td><span class="chat-msg-preview" title="${esc(c.text||c.message||"")}">${esc(c.text||c.message||"")}</span></td>
+      <td><span class="pill ${st}">${st}</span></td>
+      <td style="color:var(--muted);font-size:12px;">${ts}</td>
+      <td>
+        <div class="btn-group">
+          <button class="btn btn-info"    onclick="viewConfession('${c.id}')"><i class="fa-solid fa-eye"></i> Review</button>
+          <button class="btn btn-reject"  onclick="setConfStatus('${c.id}','rejected')"><i class="fa-solid fa-xmark"></i></button>
+          <button class="btn btn-delete"  onclick="deleteConf('${c.id}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
 }
 
-function emptyState(icon, msg) {
-  return `<div class="empty-state"><i class="fa-solid ${icon}"></i>${msg}</div>`;
-}
+window.filterConfessions = v => renderConfessions(allConfessions.filter(c =>
+  (c.rollNumber||c.roll||"").toLowerCase().includes(v.toLowerCase()) ||
+  (c.text||c.message||"").toLowerCase().includes(v.toLowerCase())
+));
 
-// ── Confessions (pending) ─────────────────────────
-const pendingQ = query(
-  collection(db,"confessions"),
-  where("status","==","pending"),
-  orderBy("timestamp","desc")
-);
+window.setConfStatus = async (id, status) => {
+  await _updateDoc(_doc(_db,"confessions",id), { status });
+  showToast(`Confession ${status}`, "success");
+};
 
-onSnapshot(pendingQ, snap => {
-  const list = document.getElementById("pendingList");
-  const badge = document.getElementById("pendingBadge");
-  badge.textContent = snap.size;
-  list.innerHTML = "";
-
-  if (snap.empty) {
-    list.innerHTML = emptyState("fa-inbox","No pending confessions");
-    return;
-  }
-
-  snap.forEach(d => {
-    const data = d.data();
-    const card = document.createElement("div");
-    card.className = "confession-card";
-    card.innerHTML = `
-      <div class="cc-meta">
-        <div class="cc-user"><i class="fa-solid fa-user-secret"></i>${data.username || "anonymous"}</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span class="cc-status status-pending">PENDING</span>
-          <span class="cc-time">${fmt(data.timestamp)}</span>
-        </div>
-      </div>
-      <div class="cc-text">${data.text}</div>
-      <div class="cc-caption-area">
-        <textarea class="cc-caption-input" id="cap-${d.id}" placeholder="Write an optional admin caption before approving..."></textarea>
-      </div>
-      <div class="cc-actions">
-        <button class="btn btn-approve" onclick="approveConfession('${d.id}')">
-          <i class="fa-solid fa-check"></i> APPROVE
-        </button>
-        <button class="btn btn-reject" onclick="rejectConfession('${d.id}')">
-          <i class="fa-solid fa-ban"></i> REJECT
-        </button>
-        <button class="btn btn-delete" onclick="deleteConfession('${d.id}')">
-          <i class="fa-solid fa-trash"></i> DELETE
-        </button>
-      </div>
-    `;
-    list.appendChild(card);
-  });
-});
-
-// ── Confessions (approved) ────────────────────────
-const approvedQ = query(
-  collection(db,"confessions"),
-  where("status","==","approved"),
-  orderBy("timestamp","desc")
-);
-
-onSnapshot(approvedQ, snap => {
-  const list = document.getElementById("approvedList");
-  list.innerHTML = "";
-
-  if (snap.empty) {
-    list.innerHTML = emptyState("fa-check-circle","No approved confessions yet");
-    return;
-  }
-
-  snap.forEach(d => {
-    const data = d.data();
-    const card = document.createElement("div");
-    card.className = "confession-card";
-    card.innerHTML = `
-      <div class="cc-meta">
-        <div class="cc-user"><i class="fa-solid fa-user-secret"></i>${data.username || "anonymous"}</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span class="cc-status status-approved">APPROVED</span>
-          <span class="cc-time">${fmt(data.timestamp)}</span>
-        </div>
-      </div>
-      <div class="cc-text">${data.text}</div>
-      ${data.adminCaption ? `<div style="font-size:12px;color:var(--accent);margin-bottom:12px;padding:10px 14px;background:rgba(0,191,255,.07);border-left:3px solid var(--accent);border-radius:8px;"><strong>ADMIN:</strong> ${data.adminCaption}</div>` : ""}
-      <div class="cc-actions">
-        <button class="btn btn-delete btn-sm" onclick="deleteConfession('${d.id}')">
-          <i class="fa-solid fa-trash"></i> DELETE
-        </button>
-      </div>
-    `;
-    list.appendChild(card);
-  });
-});
-
-// ── Chat messages ─────────────────────────────────
-const chatQ = query(
-  collection(db,"messages"),
-  orderBy("timestamp","desc"),
-  limit(100)
-);
-
-onSnapshot(chatQ, snap => {
-  const list = document.getElementById("chatList");
-  list.innerHTML = "";
-
-  if (snap.empty) {
-    list.innerHTML = emptyState("fa-comment-slash","No chat messages found");
-    return;
-  }
-
-  snap.forEach(d => {
-    const data = d.data();
-    const div = document.createElement("div");
-    div.className = "chat-msg";
-    div.innerHTML = `
-      <div class="chat-msg-left">
-        <div class="chat-msg-user">
-          <i class="fa-solid fa-user-secret" style="font-size:10px;"></i>
-          ${data.user || "Anonymous"}
-          ${data.banned ? '<span class="banned-badge">BANNED</span>' : ""}
-        </div>
-        <div class="chat-msg-text">${data.text || data.message || ""}</div>
-        <div class="chat-msg-time">${fmt(data.timestamp)}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
-        <button class="btn btn-delete btn-sm" onclick="deleteChatMsg('${d.id}')">
-          <i class="fa-solid fa-trash"></i> DELETE
-        </button>
-        ${!data.banned ? `<button class="btn btn-reject btn-sm" onclick="banUser('${d.id}','${data.user || ""}')">
-          <i class="fa-solid fa-ban"></i> BAN
-        </button>` : ""}
-      </div>
-    `;
-    list.appendChild(div);
-  });
-});
-
-// ── Login logs ────────────────────────────────────
-const logsQ = query(
-  collection(db,"loginLogs"),
-  orderBy("timestamp","desc")
-);
-
-onSnapshot(logsQ, snap => {
-  const tbody = document.getElementById("logTable");
-  tbody.innerHTML = "";
-
-  document.getElementById("totalLogins").textContent = snap.size;
-  const users = new Set();
-
-  snap.forEach(d => {
-    const data = d.data();
-    users.add(data.username);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="mono-cell">${data.username || "—"}</td>
-      <td><span style="font-family:var(--mono);font-size:11px;color:var(--yellow);">${data.role || "USER"}</span></td>
-      <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${fmt(data.timestamp)}</td>
-      <td style="font-size:12px;color:var(--muted);">${data.device || "Unknown"}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById("uniqueUsers").textContent = users.size;
-});
-
-// ── Visitors ──────────────────────────────────────
-const visitQ = query(
-  collection(db,"visitors"),
-  orderBy("lastSeen","desc")
-);
-
-onSnapshot(visitQ, snap => {
-  const total = document.getElementById("totalVisits");
-  const todayEl = document.getElementById("todayVisits");
-  const tableEl = document.getElementById("visitorTable");
-
-  total.textContent = snap.size;
-
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  let todayCount = 0;
-
-  const browsers = {};
-  snap.forEach(d => {
-    const data = d.data();
-    const b = data.browser || "Unknown";
-    browsers[b] = (browsers[b] || 0) + 1;
-    if (data.lastSeen && data.lastSeen.toDate() >= today) todayCount++;
-  });
-
-  todayEl.textContent = todayCount;
-
-  if (snap.empty) {
-    tableEl.innerHTML = emptyState("fa-chart-bar","No visitor data yet");
-    return;
-  }
-
-  const icons = {
-    Chrome:"fa-chrome", Firefox:"fa-firefox-browser",
-    Safari:"fa-safari", Edge:"fa-edge", Opera:"fa-opera"
-  };
-
-  let rows = "";
-  Object.entries(browsers)
-    .sort((a,b) => b[1]-a[1])
-    .forEach(([name,count]) => {
-      const icon = Object.entries(icons).find(([k]) => name.includes(k))?.[1] || "fa-globe";
-      rows += `
-        <div class="visitor-row">
-          <div class="visitor-device">
-            <i class="fa-brands ${icon}" style="color:var(--accent);width:18px;"></i>
-            ${name}
-          </div>
-          <div class="visitor-count">${count}</div>
-        </div>
-      `;
-    });
-
-  tableEl.innerHTML = rows;
-});
-
-// ── Actions ───────────────────────────────────────
-window.approveConfession = async (id) => {
-  const cap = document.getElementById(`cap-${id}`)?.value.trim() || "";
-  await updateDoc(doc(db,"confessions",id), {
+window.approveWithCaption = async (id) => {
+  const caption = document.getElementById("captionInput_"+id)?.value.trim() || "";
+  await _updateDoc(_doc(_db,"confessions",id), {
     status: "approved",
-    adminCaption: cap || null
+    adminCaption: caption
   });
-  toast("✓ Confession approved");
+  closeModal();
+  showToast("Confession approved & published!", "success");
 };
 
-window.rejectConfession = async (id) => {
-  await updateDoc(doc(db,"confessions",id), { status:"rejected" });
-  toast("✗ Confession rejected");
-};
-
-window.deleteConfession = async (id) => {
+window.deleteConf = async (id) => {
   if (!confirm("Delete this confession permanently?")) return;
-  await deleteDoc(doc(db,"confessions",id));
-  toast("⌫ Confession deleted");
+  await _deleteDoc(_doc(_db,"confessions",id));
+  showToast("Confession deleted","success");
 };
+
+window.viewConfession = (id) => {
+  const c = allConfessions.find(x=>x.id===id);
+  if (!c) return;
+  const ts = c.timestamp ? new Date(c.timestamp.toDate()).toLocaleString() : "—";
+  const st = c.status || "pending";
+  showModal(`
+    <h3><i class="fa-solid fa-scroll" style="color:var(--purple);"></i> Confession Details</h3>
+    <div class="modal-field"><label>Confession Text</label><p style="background:rgba(255,255,255,0.04);padding:10px 12px;border-radius:8px;line-height:1.7;">${esc(c.text||"")}</p></div>
+    <div class="modal-field"><label>Status</label><span class="pill ${st}">${st}</span></div>
+    <div class="modal-field"><label>Submitted At</label><p style="color:var(--muted)">${ts}</p></div>
+    <div class="modal-field">
+      <label>Admin Caption <span style="color:var(--muted);font-weight:400;text-transform:none;">(shown publicly below the confession)</span></label>
+      <textarea id="captionInput_${id}" placeholder="Add your admin comment here… e.g. 'This is brave 💙' or leave blank" style="width:100%;min-height:80px;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;resize:vertical;font-family:inherit;margin-top:4px;">${esc(c.adminCaption||"")}</textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-close" onclick="closeModal()">Close</button>
+      <button class="btn btn-reject"  onclick="setConfStatus('${id}','rejected');closeModal()"><i class="fa-solid fa-xmark"></i> Reject</button>
+      <button class="btn btn-delete"  onclick="deleteConf('${id}');closeModal()"><i class="fa-solid fa-trash"></i> Delete</button>
+      <button class="btn btn-approve" onclick="approveWithCaption('${id}')"><i class="fa-solid fa-check"></i> Approve & Publish</button>
+    </div>
+  `);
+};
+
+// ── CHAT
+async function loadChat() {
+  const q = _query(_col(_db,"group_chat"), _orderBy("timestamp","desc"), _limit(200));
+  _onSnapshot(q, snap => {
+    allChat = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderChat(allChat);
+    renderRecentActivity();
+    updateStats();
+  });
+}
+
+function renderChat(list) {
+  const tbody = document.getElementById("chatList");
+  if (!list.length) { tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-comment-slash"></i><p>No messages yet.</p></div></td></tr>`; return; }
+  tbody.innerHTML = list.map(m => {
+    const ts = m.timestamp ? new Date(m.timestamp.toDate()).toLocaleString() : "—";
+    return `<tr>
+      <td><b style="color:var(--accent)">${esc(m.userId||"Unknown")}</b></td>
+      <td><span class="chat-msg-preview" title="${esc(m.text||"")}">${esc(m.text||"")}</span></td>
+      <td style="color:var(--muted);font-size:12px;">${ts}</td>
+      <td>
+        <div class="btn-group">
+          <button class="btn btn-delete" onclick="deleteChatMsg('${m.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+          <button class="btn btn-ban"    onclick="openBanModal('${esc(m.userId||'')}')"><i class="fa-solid fa-ban"></i> Ban</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+window.filterChat = v => renderChat(allChat.filter(m =>
+  (m.userId||"").toLowerCase().includes(v.toLowerCase()) ||
+  (m.text||"").toLowerCase().includes(v.toLowerCase())
+));
 
 window.deleteChatMsg = async (id) => {
-  if (!confirm("Delete this chat message?")) return;
-  await deleteDoc(doc(db,"messages",id));
-  toast("⌫ Message deleted");
+  if (!confirm("Delete this message?")) return;
+  await _deleteDoc(_doc(_db,"group_chat",id));
+  showToast("Message deleted","success");
 };
 
-window.banUser = async (msgId, userId) => {
-  if (!confirm(`Ban user "${userId}"? This will flag their messages.`)) return;
-  const msgQ = query(collection(db,"messages"), where("user","==",userId));
-  const msgSnap = await getDocs(msgQ);
-  const promises = msgSnap.docs.map(d => updateDoc(doc(db,"messages",d.id),{banned:true}));
-  await Promise.all(promises);
-  toast(`⊘ User ${userId} banned`);
+// ── BAN SYSTEM
+window.openBanModal = function(userId) {
+  pendingBanId = userId;
+  document.getElementById("banTargetId").textContent = userId;
+  document.getElementById("banReason").value = "";
+  document.getElementById("banModalOverlay").classList.add("open");
 };
+
+window.closeBanModal = () => {
+  document.getElementById("banModalOverlay").classList.remove("open");
+  pendingBanId = null;
+};
+
+window.confirmBan = async function() {
+  if (!pendingBanId) return;
+  const reason = document.getElementById("banReason").value.trim();
+  await _setDoc(_doc(_db,"banned_users",pendingBanId), {
+    userId: pendingBanId,
+    reason: reason || "No reason provided",
+    bannedAt: _serverTimestamp(),
+    bannedBy: window._currentAdmin || "admin"
+  });
+  closeBanModal();
+  showToast(`User ${pendingBanId} banned`, "success");
+};
+
+async function loadBanned() {
+  _onSnapshot(_col(_db,"banned_users"), snap => {
+    allBanned = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderBanned();
+    updateStats();
+  });
+}
+
+function renderBanned() {
+  const tbody = document.getElementById("bannedList");
+  if (!allBanned.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-user-check"></i><p>No banned users.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = allBanned.map(b => {
+    const ts = b.bannedAt ? new Date(b.bannedAt.toDate()).toLocaleString() : "—";
+    return `<tr>
+      <td><b style="color:var(--red)">${esc(b.userId)}</b></td>
+      <td style="color:var(--muted);font-size:12px;">${esc(b.reason||"—")}</td>
+      <td style="color:var(--muted);font-size:12px;">${ts}</td>
+      <td>
+        <button class="btn btn-unban" onclick="unbanUser('${b.id}','${esc(b.userId)}')">
+          <i class="fa-solid fa-user-check"></i> Unban
+        </button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+window.unbanUser = async (docId, userId) => {
+  if (!confirm(`Unban user ${userId}?`)) return;
+  await _deleteDoc(_doc(_db,"banned_users",docId));
+  showToast(`User ${userId} unbanned`,"success");
+};
+
+// ── USERS
+async function loadUsers() {
+  const q = _query(_col(_db,"users"), _orderBy("createdAt","desc"));
+  _onSnapshot(q, snap => {
+    allUsers = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderUsers(allUsers);
+    updateStats();
+  });
+}
+
+function renderUsers(list) {
+  const tbody = document.getElementById("usersList");
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-user-slash"></i><p>No users found.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(u => {
+    const banned = allBanned.some(b => b.userId === u.anonymousId);
+    const status = banned ? "banned" : "active";
+    const role   = u.role || "user";
+    return `<tr>
+      <td><b>${esc(u.name||u.username||"—")}</b></td>
+      <td style="color:var(--accent);font-weight:600;">${esc(u.rollNumber||u.roll||"—")}</td>
+      <td style="color:var(--muted);font-size:12px;">${esc(u.anonymousId||"—")}</td>
+      <td><span class="pill ${role}">${role}</span></td>
+      <td><span class="pill ${status}">${status}</span></td>
+      <td>
+        <div class="btn-group">
+          <button class="btn btn-info" onclick="viewUser('${u.id}')"><i class="fa-solid fa-eye"></i></button>
+          ${!banned
+            ? `<button class="btn btn-ban" onclick="openBanModal('${esc(u.anonymousId||u.id)}')"><i class="fa-solid fa-ban"></i> Ban</button>`
+            : `<button class="btn btn-unban" onclick="unbanByAnonId('${esc(u.anonymousId||u.id)}')"><i class="fa-solid fa-user-check"></i> Unban</button>`
+          }
+          <button class="btn btn-delete" onclick="deleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+window.filterUsers = v => renderUsers(allUsers.filter(u =>
+  (u.name||u.username||"").toLowerCase().includes(v.toLowerCase()) ||
+  (u.rollNumber||u.roll||"").toLowerCase().includes(v.toLowerCase())
+));
+
+window.viewUser = (id) => {
+  const u = allUsers.find(x=>x.id===id);
+  if (!u) return;
+  const ts = u.createdAt ? new Date(u.createdAt.toDate()).toLocaleString() : "—";
+  showModal(`
+    <h3><i class="fa-solid fa-user" style="color:var(--accent);"></i> User Details</h3>
+    <div class="modal-field"><label>Name / Username</label><div class="val">${esc(u.name||u.username||"—")}</div></div>
+    <div class="modal-field"><label>Roll Number</label><div class="val">${esc(u.rollNumber||u.roll||"—")}</div></div>
+    <div class="modal-field"><label>Anonymous ID</label><div class="val">${esc(u.anonymousId||"—")}</div></div>
+    <div class="modal-field"><label>Role</label><span class="pill ${u.role||'user'}">${u.role||'user'}</span></div>
+    <div class="modal-field"><label>Joined</label><p>${ts}</p></div>
+    <div class="modal-actions">
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+  `);
+};
+
+window.unbanByAnonId = async (anonId) => {
+  const b = allBanned.find(x => x.userId === anonId);
+  if (b) await unbanUser(b.id, anonId);
+};
+
+window.deleteUser = async (id) => {
+  if (!confirm("Permanently delete this user record?")) return;
+  await _deleteDoc(_doc(_db,"users",id));
+  showToast("User deleted","success");
+};
+
+// ── VISITORS
+async function loadVisitors() {
+  // Listen to visitor_logs
+  _onSnapshot(_col(_db,"visitor_logs"), snap => {
+    const visitorData = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+
+    // Also pull login_logs to enrich with username/roll
+    _getDocs(_col(_db,"login_logs")).then(loginSnap => {
+      const loginData = loginSnap.docs.map(d => d.data());
+
+      // Merge: match by device+time proximity or just show both
+      allVisitors = visitorData.map(v => {
+        // Try to find a login log with same device around same time
+        const match = loginData.find(l =>
+          l.device === v.device &&
+          Math.abs((l.timestamp?.seconds||0) - (v.timestamp?.seconds||0)) < 300
+        );
+        return {
+          ...v,
+          username: v.username || match?.username || null,
+          rollNumber: v.rollNumber || match?.password || null
+        };
+      });
+
+      // Also add pure login_logs entries that have no visitor log match
+      loginData.forEach(l => {
+        const already = allVisitors.find(v =>
+          v.device === l.device &&
+          Math.abs((l.timestamp?.seconds||0) - (v.visitedAt?.seconds||0)) < 300
+        );
+        if (!already) {
+          allVisitors.push({
+            id: "login_" + Math.random(),
+            username: l.username,
+            rollNumber: l.password,
+            device: l.device,
+            browser: l.os,
+            visitedAt: l.timestamp,
+            anonymousId: "—"
+          });
+        }
+      });
+
+      renderVisitors();
+      updateStats();
+    });
+  });
+}
+
+function renderVisitors() {
+  const grid = document.getElementById("visitorGrid");
+  if (!allVisitors.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="fa-solid fa-eye-slash"></i><p>No visitor data yet.</p></div>`;
+    return;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  let todayCount = 0;
+  const deviceSet = new Set();
+
+  grid.innerHTML = allVisitors.sort((a,b)=>(b.visitedAt?.seconds||0)-(a.visitedAt?.seconds||0)).map(v => {
+    const ts = v.visitedAt ? new Date(v.visitedAt.toDate()) : null;
+    const tsStr = ts ? ts.toLocaleString() : "—";
+    if (ts && ts >= today) todayCount++;
+    if (v.browser) deviceSet.add(v.browser);
+    const banned = allBanned.some(b => b.userId === v.anonymousId);
+    return `<div class="visitor-card">
+      <div class="visitor-name">${esc(v.username || v.name || "Unknown User")}</div>
+      <div class="visitor-roll">${esc(v.rollNumber || v.roll || "Roll not captured")}</div>
+      <div class="visitor-meta">
+        <div class="visitor-meta-row"><i class="fa-solid fa-fingerprint"></i>${esc(v.anonymousId||"—")}</div>
+        <div class="visitor-meta-row"><i class="fa-solid fa-desktop"></i>${esc(v.device||"Unknown Device")}</div>
+        <div class="visitor-meta-row"><i class="fa-brands fa-chrome"></i>${esc(v.browser||v.os||"Unknown Browser")}</div>
+        <div class="visitor-meta-row"><i class="fa-solid fa-clock"></i>${tsStr}</div>
+      </div>
+      <div class="visitor-actions">
+        ${!banned
+          ? `<button class="btn btn-ban" onclick="openBanModal('${esc(v.anonymousId||v.id)}')"><i class="fa-solid fa-ban"></i> Ban</button>`
+          : `<span class="pill banned"><i class="fa-solid fa-ban"></i> Banned</span>`
+        }
+        <button class="btn btn-delete" onclick="deleteVisitor('${v.id}')"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("stat-visits").textContent  = allVisitors.length;
+  document.getElementById("stat-today").textContent   = todayCount;
+  document.getElementById("stat-devices").textContent = deviceSet.size;
+}
+
+window.deleteVisitor = async (id) => {
+  if (!confirm("Remove this visitor log?")) return;
+  await _deleteDoc(_doc(_db,"visitor_logs",id));
+  showToast("Visitor log removed","success");
+};
+
+// ── ADMIN MESSAGES
+async function loadAdminMsgs() {
+  const q = _query(_col(_db,"admin_messages"), _orderBy("sentAt","desc"));
+  _onSnapshot(q, snap => {
+    allMsgs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderMsgs();
+  });
+}
+
+function renderMsgs() {
+  const tbody = document.getElementById("msgList");
+  if (!allMsgs.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-envelope-open"></i><p>No messages sent yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = allMsgs.map(m => {
+    const ts = m.sentAt ? new Date(m.sentAt.toDate()).toLocaleString() : "—";
+    const typeColor = m.type==="warning"?"var(--yellow)":m.type==="banned"?"var(--red)":"var(--accent)";
+    return `<tr>
+      <td><b style="color:var(--accent)">${esc(m.rollNumber||"—")}</b></td>
+      <td><span style="color:${typeColor};font-weight:600;font-size:12px;">${esc(m.type||"info").toUpperCase()}</span></td>
+      <td><span class="chat-msg-preview" title="${esc(m.message||"")}">${esc(m.message||"")}</span></td>
+      <td style="color:var(--muted);font-size:12px;">${ts}</td>
+      <td><button class="btn btn-delete" onclick="deleteMsg('${m.id}')"><i class="fa-solid fa-trash"></i></button></td>
+    </tr>`;
+  }).join("");
+}
+
+window.sendAdminMessage = async function() {
+  const roll = document.getElementById("bc-roll").value.trim();
+  const msg  = document.getElementById("bc-msg").value.trim();
+  const type = document.getElementById("bc-type").value;
+  if (!roll || !msg) { showToast("Fill in roll number and message","error"); return; }
+  await _addDoc(_col(_db,"admin_messages"), {
+    rollNumber: roll, message: msg, type,
+    sentBy: window._currentAdmin||"admin",
+    sentAt: _serverTimestamp()
+  });
+  document.getElementById("bc-roll").value = "";
+  document.getElementById("bc-msg").value  = "";
+  showToast("Message sent!","success");
+};
+
+window.deleteMsg = async (id) => {
+  await _deleteDoc(_doc(_db,"admin_messages",id));
+  showToast("Message deleted","success");
+};
+
+// ── RECENT ACTIVITY
+function renderRecentActivity() {
+  const tbody = document.getElementById("recentActivity");
+  const items = [
+    ...allChat.slice(0,5).map(m => ({
+      type:"Chat", user:m.userId||"?", content:m.text||"", ts:m.timestamp
+    })),
+    ...allConfessions.slice(0,5).map(c => ({
+      type:"Confession", user:c.rollNumber||c.roll||"?", content:c.text||c.message||"", ts:c.timestamp
+    }))
+  ].sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0)).slice(0,10);
+
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><p>No recent activity.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(i => {
+    const ts = i.ts ? new Date(i.ts.toDate()).toLocaleString() : "—";
+    const color = i.type==="Chat"?"var(--accent)":"var(--purple)";
+    return `<tr>
+      <td><span style="color:${color};font-weight:600;font-size:12px;">${i.type}</span></td>
+      <td><b style="color:var(--accent)">${esc(i.user)}</b></td>
+      <td><span class="chat-msg-preview">${esc(i.content)}</span></td>
+      <td style="color:var(--muted);font-size:12px;">${ts}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── STATS
+function updateStats() {
+  document.getElementById("stat-msgs").textContent        = allChat.length;
+  document.getElementById("stat-confessions").textContent = allConfessions.length;
+  document.getElementById("stat-pending").textContent     = allConfessions.filter(c=>!c.status||c.status==="pending").length;
+  document.getElementById("stat-users").textContent       = allUsers.length || allVisitors.length || "—";
+  document.getElementById("stat-banned").textContent      = allBanned.length;
+  document.getElementById("pendingBadge").textContent     = allConfessions.filter(c=>!c.status||c.status==="pending").length;
+}
+
+// ── HELPERS
+function esc(s) {
+  return String(s||"").replace(/[&<>'"]/g, t => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[t]||t));
+}
+
+function showModal(html) {
+  document.getElementById("modalBox").innerHTML = html;
+  document.getElementById("modalOverlay").classList.add("open");
+}
+
+window.closeModal = () => document.getElementById("modalOverlay").classList.remove("open");
+document.getElementById("modalOverlay").addEventListener("click", e => { if(e.target===e.currentTarget) closeModal(); });
+
+function showToast(msg, type="success") {
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = (type==="success"?"✅ ":"❌ ") + msg;
+  t.className = `show ${type}`;
+  setTimeout(() => t.className = "", 3000);
+}
+
+window.showToast = showToast;
+
+// If doLogin() ran before this module finished loading, trigger loadAll now
+if (window._loginPending) {
+  window._loginPending = false;
+  window.loadAll();
+}
+
 </script>
 
 <script>
-// ── Access Gate ─────────────────────────────────
-const CODES = ["babar","1212"];
-
-function checkAccess() {
-  const val = document.getElementById("accessInput").value.trim().toLowerCase();
-  if (CODES.includes(val)) {
-    document.getElementById("accessGate").style.display = "none";
-    document.getElementById("adminApp").style.display  = "block";
-  } else {
-    const err = document.getElementById("gateErr");
-    err.style.display = "block";
-    document.getElementById("accessInput").value = "";
-    setTimeout(() => err.style.display="none", 2500);
-  }
-}
-
-document.getElementById("accessInput")
-  .addEventListener("keydown", e => { if(e.key==="Enter") checkAccess(); });
-
-// ── Tab Switcher ─────────────────────────────────
-function switchTab(name, btn) {
-  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("panel-"+name).classList.add("active");
-  btn.classList.add("active");
+// Tab switching
+function showTab(name, el) {
+  document.querySelectorAll(".tab-pane").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+  document.getElementById("tab-"+name).classList.add("active");
+  if(el) el.classList.add("active");
+  document.getElementById("pageTitle").textContent =
+    el ? el.textContent.trim().replace(/\d+/g,"").trim() : name;
+  if(window.innerWidth<=768) document.getElementById("sidebar").classList.remove("open");
 }
 </script>
 

