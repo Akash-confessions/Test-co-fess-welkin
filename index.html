@@ -125,17 +125,25 @@ z-index:10;
 .input{
 width:100%;
 padding:14px 14px 14px 45px;
-border:none;
+border:2px solid transparent; /* Smooth border transition for warning status */
 outline:none;
 border-radius:12px;
 background:rgba(255,255,255,.12);
 backdrop-filter:blur(8px);
 color:white;
 font-size:15px;
+transition: all 0.3s ease;
 }
 
 .input::placeholder{
 color:#d0d0d0;
+}
+
+/* Professional Error Glow */
+.input.error-glow {
+border-color: #ff3b30;
+background: rgba(255, 59, 48, 0.15);
+box-shadow: 0 0 10px rgba(255, 59, 48, 0.4);
 }
 
 /* REMEMBER */
@@ -200,7 +208,7 @@ font-size:18px;
 background:white;
 }
 
-/* POPUP */
+/* POPUPS */
 
 .music-popup{
 
@@ -241,6 +249,36 @@ color:white;
 
 }
 
+/* Professional Error Alert Notification Box */
+.alert-toast {
+position: fixed;
+top: -100px;
+left: 50%;
+transform: translateX(-50%);
+background: rgba(20, 20, 20, 0.95);
+border-left: 4px solid #ff3b30;
+padding: 14px 24px;
+border-radius: 8px;
+color: white;
+font-size: 14px;
+font-weight: 500;
+z-index: 10000;
+box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+display: flex;
+align-items: center;
+gap: 10px;
+transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.alert-toast.show {
+top: 20px;
+}
+
+.alert-toast i {
+color: #ff3b30;
+font-size: 16px;
+}
+
 </style>
 </head>
 
@@ -252,6 +290,12 @@ color:white;
 </video>
 
 <div class="overlay"></div>
+
+<!-- TOAST ALERT NOTIFICATION -->
+<div class="alert-toast" id="alertToast">
+<i class="fa-solid fa-circle-exclamation"></i>
+<span id="alertMessage">Please fill in all layout credentials.</span>
+</div>
 
 <!-- MUSIC POPUP -->
 
@@ -296,6 +340,7 @@ to access private confessions
 <input
 type="text"
 class="input"
+id="username"
 placeholder="Username">
 </div>
 
@@ -304,8 +349,9 @@ placeholder="Username">
 <div class="input-box">
 <i class="fa-solid fa-lock icon"></i>
 <input
-type="text"
+type="password" /* Switched to password field format for production privacy */
 class="input"
+id="password"
 placeholder="Password">
 </div>
 
@@ -368,10 +414,61 @@ initializeApp(firebaseConfig);
 <script>
 
 function login(){
+const userField = document.getElementById("username");
+const passField = document.getElementById("password");
+const toast = document.getElementById("alertToast");
+const toastMsg = document.getElementById("alertMessage");
 
-window.location.href="home.html";
+// Remove any existing error glows before checking
+userField.classList.remove("error-glow");
+passField.classList.remove("error-glow");
 
+// Validation Logic
+if (userField.value.trim() === "" && passField.value.trim() === "") {
+userField.classList.add("error-glow");
+passField.classList.add("error-glow");
+showToast("Please enter your Username and Password.");
+return;
+} 
+
+if (userField.value.trim() === "") {
+userField.classList.add("error-glow");
+userField.focus();
+showToast("Username field cannot be left blank.");
+return;
 }
+
+if (passField.value.trim() === "") {
+passField.classList.add("error-glow");
+passField.focus();
+showToast("Password field cannot be left blank.");
+return;
+}
+
+// If validation passes smoothly, redirect
+window.location.href="home.html";
+}
+
+function showToast(message) {
+const toast = document.getElementById("alertToast");
+const toastMsg = document.getElementById("alertMessage");
+
+toastMsg.innerText = message;
+toast.classList.add("show");
+
+// Automatically hide notification bar after 3.5 seconds
+setTimeout(() => {
+toast.classList.remove("show");
+}, 3500);
+}
+
+// Clean up error states dynamically when user types
+document.getElementById("username").addEventListener("input", function() {
+this.classList.remove("error-glow");
+});
+document.getElementById("password").addEventListener("input", function() {
+this.classList.remove("error-glow");
+});
 
 function toggleMusic(){
 
@@ -408,3 +505,5 @@ document
 
 </body>
 </html>
+
+```
