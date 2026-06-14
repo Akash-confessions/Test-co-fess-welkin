@@ -1,9 +1,3 @@
-Looking closely at your new screenshot (**1000039474.jpg**), two specific things are causing this layout breakout on wide screens or in desktop mode:
- 1. **The background *is* transparent, but the layout structure shifted:** The blurred container (--bg-color) is stuck completely over to the right side because of margin-left: auto; margin-right: 0;. On a phone, it takes up the whole screen, but on a wide desktop screen, it shrinks into a narrow column on the right, exposing your raw, un-blurred background video on the left.
- 2. **Missing Chat Box/Input Area:** Because the overall layout container didn't have a solid height initialization ruleset for widescreen viewing, the input panel got pushed entirely past the bottom edge of your screen.
-Let's fix this so it looks perfect, centered, and fully functional on **both mobile and desktop devices**.
-Here is your updated, unified code:
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
