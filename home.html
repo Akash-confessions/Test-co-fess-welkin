@@ -23,10 +23,11 @@ overflow: hidden;
 display: flex;
 justify-content: center;
 align-items: center;
+/* Force complete and total transparency down to the base root */
 background: transparent !important; 
 }
 
-/* BACKGROUND VIDEO LAYER */
+/* CRYSTAL CLEAR 1080P BACKGROUND VIDEO LAYER */
 #bgVideo{
 position:fixed;
 top:0;
@@ -37,6 +38,7 @@ object-fit:cover;
 z-index:-2;
 }
 
+/* NO DARK OVERLAY - LEFT COMPLETELY EMPTY AND CLEAR FOR 1080P VISIBILITY */
 .overlay{
 position:fixed;
 inset:0;
@@ -44,7 +46,9 @@ background: transparent;
 z-index:-1;
 }
 
-/* MAIN STRUCTURE: Adaptive Grid to stop input fields from dropping off-screen */
+/* MAIN CHAT INTERFACE CORE 
+   Switched to a secure grid framework to prevent components from dropping below screen limits on desktop aspect ratios
+*/
 .chat-app {
 width: 100%;
 max-width: 480px; 
@@ -59,7 +63,7 @@ border-right: 1px solid rgba(255, 255, 255, 0.1);
 transition: max-width 0.3s ease;
 }
 
-/* HEADER AND RESPONSIVE NAVIGATION LAYER */
+/* HEADER LAYER COMPONENT */
 .chat-header-wrapper {
 position: relative;
 z-index: 10;
@@ -75,6 +79,7 @@ align-items: center;
 padding: 14px 18px;
 }
 
+/* Capital letters but small font size framework as requested */
 .chat-header-title {
 color: #00bfff;
 font-weight: 800;
@@ -96,7 +101,7 @@ display: block;
 transform: rotate(45deg);
 }
 
-/* Mobile Dropdown Styling Menu */
+/* SETTINGS DROPDOWN MENU */
 .dropdown-menu {
 position: absolute;
 top: 100%;
@@ -121,9 +126,14 @@ padding: 12px 16px;
 text-decoration: none;
 font-size: 13px;
 border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+transition: background 0.2s;
 display: flex;
 align-items: center;
 gap: 10px;
+}
+
+.dropdown-menu a:last-child {
+border-bottom: none;
 }
 
 .dropdown-menu a:hover {
@@ -131,7 +141,7 @@ background: rgba(0, 191, 255, 0.2);
 color: #00bfff;
 }
 
-/* LIVE CHAT VIEW FEED CONTAINER */
+/* SCROLLABLE INNER FEED STREAM */
 .messages-box {
 overflow-y: auto;
 padding: 20px;
@@ -141,6 +151,7 @@ gap: 14px;
 background: transparent !important;
 }
 
+/* Custom Scrollbar Rules for Laptop/Desktop Browsers */
 .messages-box::-webkit-scrollbar {
 width: 5px;
 }
@@ -149,7 +160,7 @@ background: rgba(255, 255, 255, 0.15);
 border-radius: 10px;
 }
 
-/* CHAT BUBBLES LEFT SIDE CONFIGURATION */
+/* CHAT BUBBLES - ALL FORCED TO ALIGN LEFT SIDE ONLY */
 .message {
 width: auto;
 max-width: 85%;
@@ -161,7 +172,7 @@ color: #fff;
 font-size: 14px;
 line-height: 1.4;
 box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-align-self: flex-start;
+align-self: flex-start; /* Keeps everyone's messages on the left side */
 background: rgba(20, 22, 31, 0.75);
 border-left: 3px solid #00bfff;
 }
@@ -184,6 +195,7 @@ color: #00bcff;
 color: rgba(255, 255, 255, 0.4);
 }
 
+/* Styling modifier for messages sent by you (Still remains on the left side) */
 .message.my-message {
 background: rgba(35, 30, 45, 0.85);
 border-left: 3px solid #a855f7;
@@ -193,7 +205,7 @@ border-left: 3px solid #a855f7;
 color: #a855f7;
 }
 
-/* FIXED ADAPTIVE FOOTER PANELS */
+/* FIXED FOOTER CONTROLS WRAPPER (Never moves when scrolling) */
 .footer-fixed-wrap {
 width: 100%;
 background: rgba(0, 0, 0, 0.85);
@@ -203,6 +215,7 @@ display: flex;
 flex-direction: column;
 }
 
+/* CHAT INPUT AREA (Works perfectly across Desktop & Laptops) */
 .chat-input-area {
 width: 100%;
 padding: 12px 16px;
@@ -220,6 +233,7 @@ color: #fff;
 border-radius: 25px;
 outline: none;
 font-size: 14px;
+transition: border-color 0.2s;
 }
 
 .chat-input-area input:focus {
@@ -235,15 +249,24 @@ border-radius: 25px;
 font-weight: 700;
 font-size: 14px;
 cursor: pointer;
+display: block !important; /* Ensures button is explicitly visible on laptop/desktop environments */
+transition: opacity 0.2s ease;
 flex-shrink: 0;
 }
 
+.chat-input-area button:hover {
+opacity: 0.9;
+}
+
+/* ANONYMOUS ID DISPLAYER AT THE VERY BOTTOM AT THE FOOT */
 .bottom-id-bar {
 width: 100%;
 text-align: center;
 padding: 6px 10px 10px 10px;
 font-size: 11px;
 color: rgba(255, 255, 255, 0.5);
+font-weight: 500;
+letter-spacing: 0.5px;
 border-top: 1px solid rgba(255, 255, 255, 0.03);
 }
 
@@ -252,10 +275,10 @@ color: #00bfff;
 font-weight: 600;
 }
 
-/* MUSIC BUTTON ENGINE CONTROLS */
+/* FLOATING MUSIC BUTTON SYSTEM ON BOTTOM RIGHT */
 .music-btn {
 position: fixed;
-bottom: 90px;
+bottom: 90px; /* Elevated perfectly to float over the desktop input panel */
 right: 20px;
 width: 44px;
 height: 44px;
@@ -269,6 +292,11 @@ z-index: 999;
 display: flex;
 justify-content: center;
 align-items: center;
+transition: transform 0.2s;
+}
+
+.music-btn:active {
+transform: scale(0.9);
 }
 
 .music-popup {
@@ -285,6 +313,7 @@ color: white;
 font-size: 12px;
 z-index: 9999;
 max-width: 260px;
+box-shadow: 0 8px 25px rgba(0,0,0,0.5);
 border: 1px solid rgba(255,255,255,0.1);
 }
 
@@ -298,35 +327,34 @@ color: white;
 font-weight: 600;
 }
 
-/* ==========================================
-   DESKTOP AUTO-SHIFT LAYOUT OVERRIDES 
-   Triggered automatically when screen width widens
-   ========================================== */
+/* THE DESKTOP / WIDE ENVIRONMENT MODIFIER 
+   Triggers clean layout updates automatically when switching view scales.
+*/
 @media (min-width: 769px) {
     .chat-app {
-        max-width: 900px; /* Window widens gracefully */
+        max-width: 900px; /* Expands width to feel like an authentic desktop application */
     }
 
     .settings-icon {
-        display: none; /* Hide mobile gear dropdown clicker */
+        display: none !important; /* Removes the mobile mobile gear icon selector */
     }
 
-    /* Transform mobile dropdown into a clean top navigation bar automatically */
+    /* Unfurls the mobile stack popup list into a horizontal top bar system */
     .dropdown-menu {
-        position: static;
+        position: static !important;
         display: flex !important;
-        flex-direction: row;
-        width: auto;
-        background: transparent;
-        border: none;
-        border-radius: 0;
-        box-shadow: none;
+        flex-direction: row !important;
+        width: auto !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
     }
 
     .dropdown-menu a {
-        border-bottom: none;
-        padding: 8px 14px;
-        font-size: 12px;
+        border-bottom: none !important;
+        padding: 6px 14px !important;
+        font-size: 12px !important;
         border-radius: 20px;
     }
 }
@@ -354,7 +382,6 @@ font-weight: 600;
             <div class="chat-header-title">ANONYMOUS GROUP CHAT</div>
             <i class="fa-solid fa-gear settings-icon" id="settingsToggle"></i>
             
-            <!-- Universal Menu: Automatically widens out inline on Desktop -->
             <div class="dropdown-menu" id="dropdownMenu">
                 <a href="send-confession.html"><i class="fa-solid fa-paper-plane"></i> Send Confession</a>
                 <a href="public-confessions.html"><i class="fa-solid fa-users"></i> Public Confession</a>
@@ -363,10 +390,8 @@ font-weight: 600;
         </div>
     </div>
 
-    <!-- Live database feed box area -->
     <div class="messages-box" id="messagesBox"></div>
 
-    <!-- Input control system (locked visible in all desktop and mobile rendering states) -->
     <div class="footer-fixed-wrap">
         <form class="chat-input-area" id="chatForm">
             <input type="text" id="messageInput" placeholder="Type an anonymous message..." autocomplete="off" required>
@@ -384,12 +409,11 @@ font-weight: 600;
 
 <audio id="music" src="home-music.mp3" loop></audio>
 
-<!-- PRODUCTION FIREBASE SYNC ENGINE MODULE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Loaded with your exact system credentials
+  // Production verified target credentials
   const firebaseConfig = {
     apiKey: "AIzaSyBFZYXN5MJ9WOMBXfCchUWnR9LEfOOzImw",
     authDomain: "welkin-b3fee.firebaseapp.com",
@@ -409,7 +433,7 @@ font-weight: 600;
   const inputField = document.getElementById('messageInput');
   const messagesBox = document.getElementById('messagesBox');
 
-  // STREAM SAVED LIVE CONVERSATIONS FROM FIRESTORE
+  // STREAM MESSAGES LIVE IN REALTIME FROM THE STORE
   const chatQuery = query(collection(db, "group_chat"), orderBy("timestamp", "asc"), limit(100));
 
   onSnapshot(chatQuery, (snapshot) => {
@@ -440,7 +464,7 @@ font-weight: 600;
       messagesBox.scrollTop = messagesBox.scrollHeight;
   });
 
-  // WRITE AND SAVE OUTGOING MESSAGE OBJECTS PERMANENTLY
+  // WRITE DATA DIRECTLY INTO LIVE FIRESTORE COLLECTIONS PERMANENTLY
   chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const rawText = inputField.value.trim();
@@ -455,7 +479,7 @@ font-weight: 600;
           });
           inputField.value = '';
       } catch (err) {
-          console.error("Firebase write error: ", err);
+          console.error("Firebase write sequence failure: ", err);
       }
   });
 
@@ -467,7 +491,7 @@ font-weight: 600;
 </script>
 
 <script>
-// Mobile click handler logic for the settings toggler button
+// Ambient UI Toggle Operations
 const settingsToggle = document.getElementById('settingsToggle');
 const dropdownMenu = document.getElementById('dropdownMenu');
 
